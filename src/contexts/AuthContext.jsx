@@ -9,50 +9,50 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
 
+    // Función rápida: Mapear datos de sesión sin esperar DB
+    const mapSessionToUser = (sessionUser) => {
+        if (!sessionUser) return null
+        return {
+            ...sessionUser,
+            // Priorizar metadata que viene el token JWT (instantáneo)
+            role: sessionUser.user_metadata?.role || 'observer', // Default a observer si no hay rol
+            site: sessionUser.user_metadata?.site || '',
+            group: sessionUser.user_metadata?.group || '',
+            full_name: sessionUser.user_metadata?.full_name || sessionUser.email,
+            must_change_password: sessionUser.user_metadata?.must_change_password ?? false
+        }
+    }
+
+    // Fetch de fondo para actualizar datos frescos (no bloquea login)
+    const fetchProfileInBackground = async (userId) => {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single()
+
+            if (!error && data) {
+                console.log('Background profile update:', data)
+
+                // Check active status
+                if (data.is_active === false) { // Explicitly check false
+                    console.warn('User is inactive. Logging out.')
+                    await supabase.auth.signOut()
+                    setUser(null)
+                    alert('Su cuenta ha sido desactivada. Contacte al administrador.')
+                    return
+                }
+
+                setUser(prev => ({ ...prev, ...data }))
+            }
+        } catch (err) {
+            console.warn('Background fetch error:', err)
+        }
+    }
+
     useEffect(() => {
         let mounted = true
-
-        // Función rápida: Mapear datos de sesión sin esperar DB
-        const mapSessionToUser = (sessionUser) => {
-            if (!sessionUser) return null
-            return {
-                ...sessionUser,
-                // Priorizar metadata que viene e el token JWT (instantáneo)
-                role: sessionUser.user_metadata?.role || 'observer', // Default a observer si no hay rol
-                site: sessionUser.user_metadata?.site || '',
-                group: sessionUser.user_metadata?.group || '',
-                full_name: sessionUser.user_metadata?.full_name || sessionUser.email,
-                must_change_password: sessionUser.user_metadata?.must_change_password ?? false
-            }
-        }
-
-        // Fetch de fondo para actualizar datos frescos (no bloquea login)
-        const fetchProfileInBackground = async (userId) => {
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single()
-
-                if (!error && data && mounted) {
-                    console.log('Background profile update:', data)
-
-                    // Check active status
-                    if (data.is_active === false) { // Explicitly check false
-                        console.warn('User is inactive. Logging out.')
-                        await supabase.auth.signOut()
-                        setUser(null)
-                        alert('Su cuenta ha sido desactivada. Contacte al administrador.')
-                        return
-                    }
-
-                    setUser(prev => ({ ...prev, ...data }))
-                }
-            } catch (err) {
-                console.warn('Background fetch error:', err)
-            }
-        }
 
         const initializeAuth = async () => {
             try {
