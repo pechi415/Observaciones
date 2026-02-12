@@ -780,7 +780,14 @@ export default function DashboardPage() {
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
                     ].map((card, idx) => (
-                        <div key={idx} onClick={card.onClick} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow group">
+                        <div key={idx} onClick={card.onClick} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow group relative overflow-hidden">
+                            {/* Decorative background element for interactive cards */}
+                            {card.onClick && card.title !== 'Seguridad Global' && (
+                                <div className={`absolute top-0 right-0 p-1.5 bg-${card.color}-50 text-${card.color}-400 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-all`}>
+                                    <List className="w-3.5 h-3.5" />
+                                </div>
+                            )}
+
                             <div className="flex items-center gap-4">
                                 <div className={`p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform`}>
                                     <card.icon className="w-6 h-6" />
@@ -790,6 +797,12 @@ export default function DashboardPage() {
                                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{card.title}</p>
                                 </div>
                             </div>
+
+                            {card.onClick && card.title !== 'Seguridad Global' && (
+                                <div className="text-gray-300 group-hover:text-blue-500 transition-colors shrink-0">
+                                    <List className="w-5 h-5 opacity-40 group-hover:opacity-100" />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
