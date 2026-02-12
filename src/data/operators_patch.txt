@@ -1,0 +1,127 @@
+2	PRIBBENOW	Gonzalez Aguilar Jorge Eliecer
+1	PRIBBENOW	Gonzalez Angulo Duvan Humberto
+2	EL DESCANSO	Gonzalez Fuentes Yeison David
+1	PRIBBENOW	Gonzalez Gomez Jose Alfredo
+1	EL DESCANSO	Gonzalez Jimenez Jarlis Alberto
+3	PRIBBENOW	Gonzalez Mejia Ricardo
+3	EL DESCANSO	Gonzalez Perez Josue David
+2	EL DESCANSO	Gonzalez Villalba Julian
+2	EL DESCANSO	Guerra De la Hoz Wladimir
+1	EL DESCANSO	Guerra Hernandez Andres Alfredo
+2	PRIBBENOW	Guerra Martinez Manuel Santander
+2	EL DESCANSO	Guerra Mendoza Robinson Jose
+3	EL DESCANSO	Guerra Troya Jorge Leonardo
+3	EL DESCANSO	Guerra Vasquez Carlos Alberto
+1	EL DESCANSO	Guerra Vasquez Josmar Alfonso
+2	EL DESCANSO	Guerrero Bolaño Edwin Enrique
+3	EL DESCANSO	Guerrero Daza Julio Cesar
+1	EL DESCANSO	Guerrero Machado Miguel Angel
+3	PRIBBENOW	Guillen Moreno Osmel Enrique
+1	EL DESCANSO	Gutierrez Barahona Harold Jhonatan
+1	EL DESCANSO	Gutierrez Daza Breinner
+1	EL DESCANSO	Gutierrez Florian Raul Andres
+1	PRIBBENOW	Gutierrez Meza Luis Francisco
+2	PRIBBENOW	Gutierrez Molina Jose Luis
+1	EL DESCANSO	Gutierrez Parra Oliver Jose
+1	PRIBBENOW	Gutierrez Vera Edson Yair
+1	EL DESCANSO	Gutierrez Villareal Jorge Luis
+2	PRIBBENOW	Guzman Castrillo Raul David
+1	EL DESCANSO	Guzman Garcia Esneider
+2	PRIBBENOW	Guzman Lopez Lider Jose
+3	EL DESCANSO	Guzman Urrea Deiner Jose
+3	EL DESCANSO	Henriquez Mieles Camilo Gregorio
+1	EL DESCANSO	Hernandez Ahumada Sergio Luis
+2	PRIBBENOW	Hernandez Araque Jorge Mario
+1	EL DESCANSO	Hernandez Berrueco Gustavo Adolfo
+3	EL DESCANSO	Hernandez Carcamo Carlos Yesid
+2	EL DESCANSO	Hernandez Centeno Mairo
+2	PRIBBENOW	Hernandez Ditta Celso Jose
+2	EL DESCANSO	Hernandez Garcia Francisco Jose
+2	EL DESCANSO	Hernandez Guzman Genaro Andres
+2	EL DESCANSO	Hernandez Lopez Celso Jesus
+1	EL DESCANSO	Hernandez Mendivelso Jose Luis
+2	PRIBBENOW	Hernandez Orozco Wilquin Enrique
+2	PRIBBENOW	Hernandez Ramirez Nairo Miguel
+2	PRIBBENOW	Hernandez Sanchez Francisco
+3	PRIBBENOW	Hernandez Torres Bladimir Enrique
+2	EL DESCANSO	Hernandez Torres Oscar Hernando
+3	PRIBBENOW	Herrera Acevedo Oscar Enrique
+2	EL DESCANSO	Herrera Cardenas Pedro Luis
+1	PRIBBENOW	Herrera Dominguez Carlos Javier
+1	PRIBBENOW	Herrera Saenz Eliceo
+2	EL DESCANSO	Herrera Villalba Lewis
+1	EL DESCANSO	Hidalgo Guerra Robinson David
+3	PRIBBENOW	Horta Ortiz Osnaider Javier
+3	PRIBBENOW	Imbrecht Morales Jonatha Xavier
+1	EL DESCANSO	Iseda Britto Jorge Ivan
+1	EL DESCANSO	Iturriago Hernandez Jhon Alexander
+3	PRIBBENOW	Jaimes Quintero Alvaro Alfonso
+2	EL DESCANSO	Jimenez Anaya Luis Eduardo
+2	EL DESCANSO	Jimenez Campo Antonio Luis
+2	EL DESCANSO	Jimenez Ditta Kadir Eduardo
+2	PRIBBENOW	Jimenez Jimenez Dilia Heriana
+2	EL DESCANSO	Jimenez Salazar Christian De Jesus
+3	EL DESCANSO	Jimenez Silva Adrian Jose
+1	EL DESCANSO	Julio Benitez Sergio Andres
+1	PRIBBENOW	Julio Maestre Edinson
+3	EL DESCANSO	Julio Mendoza Fernando
+2	PRIBBENOW	Labiosa Daza Charles Ali
+1	PRIBBENOW	Lara Castro Jairo Alberto
+2	PRIBBENOW	Lara Gil Miguel Angel
+1	PRIBBENOW	Lasso Ospino Moises Enrique
+2	PRIBBENOW	Lerma Anaya Jairo Enrique
+1	PRIBBENOW	Lindarte Quintero Andres Mauricio
+3	EL DESCANSO	Londoño Ramirez Iver Alonso
+3	EL DESCANSO	Lopez Benjumea Jairo Alfonso
+3	PRIBBENOW	Lopez Ditta Leonardo Enrique
+1	EL DESCANSO	Lopez Imbrech Wendys Katherine
+3	EL DESCANSO	Lopez Jimenez Alvaro David
+3	PRIBBENOW	Lopez Martinez Jesus
+3	PRIBBENOW	Lopez Sanchez Jhon Freddy
+1	PRIBBENOW	Lopez Trujillo Manuel Jose
+1	EL DESCANSO	Lozada Molina Carlos Andres
+2	EL DESCANSO	Lozano Jimenez Victor Alfonso
+1	EL DESCANSO	Luna Barreto Luis Fernando
+2	EL DESCANSO	Luna Barreto Luis Fernando
+3	EL DESCANSO	Luna Barreto Luis Fernando
+2	PRIBBENOW	Luna Castro Favio Enrique
+3	EL DESCANSO	Luna Castro Juan Gabriel
+2	PRIBBENOW	Machado Avila Marlon Javier
+1	EL DESCANSO	Machado Cantillo Jesus David
+2	PRIBBENOW	Machado Fernandez Diego Jose
+1	EL DESCANSO	Machado Jimenez Robert Rafael
+1	PRIBBENOW	Maestre Maestre Luis Alejandro
+2	EL DESCANSO	Malo Nieves Jose De Los Santos
+2	PRIBBENOW	Manjarres Guerrero Carlos Alberto
+1	PRIBBENOW	Manjarrez Macea Robert Joel
+2	EL DESCANSO	Marciales Donado Deyner
+1	PRIBBENOW	Marin Rios Estevin David
+2	PRIBBENOW	Marin Ruidias Daimer Jose
+2	EL DESCANSO	Marquez Duran Osnaider
+1	EL DESCANSO	Martinez Acuña Aldenis
+2	EL DESCANSO	Martinez Bolaño Edwin Antonio
+3	EL DESCANSO	Martinez Cadena Jesus Francisco
+3	EL DESCANSO	Martinez Cortes Luis Alejandro
+3	EL DESCANSO	Martinez Dominguez Sigilfred Rafael
+3	EL DESCANSO	Martinez Figueredo Andres David
+3	PRIBBENOW	Martinez Gaspar Yorgen
+3	EL DESCANSO	Martinez Gomez Eyder
+2	EL DESCANSO	Martinez Hernandez Yeider
+2	PRIBBENOW	Martinez Lopez Fidian Alfonso
+3	PRIBBENOW	Martinez Lopez Jaider Luis
+1	PRIBBENOW	Martinez Lopez Luis Carlos
+1	EL DESCANSO	Martinez Martinez Omar Yesith
+1	EL DESCANSO	Martinez Martinez Yohiner Antonio
+3	EL DESCANSO	Martinez Mendoza Jose Vicente
+1	PRIBBENOW	Martinez Molina Leanis Katerine
+3	EL DESCANSO	Martinez Muñoz Luis Guillermo
+2	EL DESCANSO	Martinez Negrete Yeison Daniel
+3	EL DESCANSO	Martinez Perez Jorman Manuel
+2	PRIBBENOW	Martinez Polo Arleide de Jesus
+2	EL DESCANSO	Martinez Rodriguez Jaiver Alberto
+2	EL DESCANSO	Martinez Suarez Fabian Enrique
+1	PRIBBENOW	Martinez Vega Miguel Angel
+2	EL DESCANSO	Martinez Vides Geider
+3	PRIBBENOW	Martinez Vides Victor Alfonso
+3	PRIBBENOW	Martinez Villadiego Luis Alfredo
+2	EL DESCANSO	Martinez Yali Maicol
