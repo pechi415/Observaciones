@@ -56,7 +56,11 @@ export default function ChangePasswordPage() {
             setPasswords({ newPassword: '', confirmPassword: '' })
 
         } catch (err) {
-            setError(err.message)
+            let userFriendlyError = err.message
+            if (err.message === 'New password should be different from the old password.') {
+                userFriendlyError = 'La nueva contraseña debe ser diferente a la anterior.'
+            }
+            setError(userFriendlyError)
         } finally {
             setLoading(false)
         }
