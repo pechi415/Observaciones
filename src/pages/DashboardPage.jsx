@@ -780,23 +780,23 @@ export default function DashboardPage() {
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
                     ].map((card, idx) => (
-                        <div key={idx} onClick={card.onClick} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow group relative overflow-hidden">
-                            <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform`}>
-                                    <card.icon className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-black text-gray-800 mb-0">{card.value}</h3>
-                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{card.title}</p>
-                                </div>
-                            </div>
-
-                            {/* Only show List icon for cards that open a modal (Detail View) */}
+                        <div key={idx} onClick={card.onClick} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:shadow-md transition-shadow group relative overflow-hidden h-24">
+                            {/* Interactive Indicator Icon (Top Right) */}
                             {['Operadores Observados', 'Desviaciones Detectadas'].includes(card.title) && (
-                                <div className="text-gray-300 group-hover:text-blue-500 transition-colors shrink-0">
-                                    <List className="w-5 h-5 opacity-40 group-hover:opacity-100" />
+                                <div className="absolute top-2 right-2 text-gray-200 group-hover:text-blue-400 transition-colors">
+                                    <List className="w-4 h-4" />
                                 </div>
                             )}
+
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2.5 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-105 transition-transform`}>
+                                    <card.icon className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-gray-800 leading-tight">{card.value}</h3>
+                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{card.title}</p>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
