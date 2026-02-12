@@ -39,6 +39,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { observationService } from '../services/observations'
 import MultiSelectFilter from '../components/MultiSelectFilter'
+import { ColumnFilter } from '../components/ColumnFilter'
 
 export default function DashboardPage() {
     const { user } = useAuth()
@@ -68,6 +69,9 @@ export default function DashboardPage() {
         data: [],
         columns: []
     })
+
+    // Table Column Filters State
+    const [tableColumnFilters, setTableColumnFilters] = useState({})
 
     // Export Function
     const handleExport = async () => {
@@ -265,56 +269,15 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchObservations = async () => {
-            // Basic query
-            let query = supabase
-                .from('observations')
-                .select('*, profiles!inner(full_name), observation_records(id)')
-                .order('created_at', { ascending: false })
-                // Increase limit to allow finding older records when filtering, or keep 10?
-                // Increasing limit to 50 to allow scrolling
-                .limit(50)
-
-            // Apply Filters
-            if (filters.startDate) {
-                query = query.gte('date', filters.startDate)
-            }
-            if (filters.endDate) {
-                query = query.lte('date', filters.endDate)
-            }
-            if (filters.shift.length > 0) {
-                query = query.in('shift', filters.shift)
-            }
-            if (filters.type.length > 0) {
-                // Use .in for exact match, or iterate for ILIKE? 
-                // Since types come from DB, exact match is better and safer for arrays
-                query = query.in('observation_type', filters.type)
-            }
-            if (filters.group.length > 0) {
-                query = query.in('group_info', filters.group)
-            }
-            if (filters.supervisor.length > 0) {
-                // Filter by supervisor name is tricky with arrays and joins.
-                // Assuming we filter by name string since we don't have IDs in filter options (yet)
-                // But wait, filterOptions.supervisors are Names.
-                // Supabase doesn't support .in() on joined tables directly easily without foreign table filtering syntax
-                // But we CAN filter by inner join property!
-                // syntax: query.in('profiles.full_name', filters.supervisor) works if referenced correctly?
-                // Actually, Supabase JS client supports filtering on joined tables:
-                // .in('profiles.full_name', values) -> This might fail if column format is rigid.
-                // Alternative: We already select profiles!inner.
-                // Let's try .in('profiles.full_name', filters.supervisor)
-                // If this fails, we might need a different approach or filter by ID.
-                // Given previous logic used ILIKE, exact match by Name is fine if options come from DB.
-                query = query.filter('profiles.full_name', 'in', `(${filters.supervisor.map(s => `"${s}"`).join(',')})`)
-            }
-
-            // User Role Filter (Existing Logic)
-            if (user && user.role !== 'admin' && user.role !== 'lider') {
-                query = query.eq('supervisor_id', user.id)
-            }
-
+            setLoadingObs(true)
             try {
-                const { data, error } = await query
+                // Fetch recent observations without global filters (Independence)
+                const { data, error } = await supabase
+                    .from('observations')
+                    .select('*, profiles(full_name), observation_records(id)')
+                    .order('created_at', { ascending: false })
+                    .limit(100)
+
                 if (error) throw error
                 setRecentObservations(data || [])
             } catch (error) {
@@ -327,7 +290,49 @@ export default function DashboardPage() {
         if (user) {
             fetchObservations()
         }
-    }, [user, filters]) // Re-run when filters change
+
+        // Set up subscription for real-time updates
+        const subscription = supabase
+            .channel('public:observations_realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'observations' }, fetchObservations)
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(subscription)
+        }
+    }, [user]) // Independent of global filters
+
+    // Client-side filtering for the table
+    const filteredObservations = useMemo(() => {
+        return recentObservations.filter(item => {
+            return Object.entries(tableColumnFilters).every(([accessor, filterValue]) => {
+                if (!filterValue) return true
+
+                // DATE RANGE FILTER
+                if (typeof filterValue === 'object' && !Array.isArray(filterValue) && (filterValue.start !== undefined || filterValue.end !== undefined)) {
+                    const itemDateStr = item.date ? String(item.date).split('T')[0] : String(item.created_at).split('T')[0]
+                    const { start, end } = filterValue
+                    if (start && end) return itemDateStr >= start && itemDateStr <= end
+                    if (start) return itemDateStr >= start
+                    if (end) return itemDateStr <= end
+                    return true
+                }
+
+                // STANDARD ARRAY FILTER
+                if (Array.isArray(filterValue)) {
+                    if (filterValue.length === 0) return false
+                    const itemValue = accessor === 'full_name'
+                        ? (item.profiles?.full_name || 'Desconocido')
+                        : accessor === 'num_ops'
+                            ? String(item.observation_records?.length || 0)
+                            : String(item[accessor] || '')
+                    return filterValue.includes(itemValue)
+                }
+
+                return true
+            })
+        })
+    }, [recentObservations, tableColumnFilters])
 
 
     // Load stats only once or when user changes
@@ -959,100 +964,163 @@ export default function DashboardPage() {
                         />
                     )
                 }
-                {/* Recent Observations Table - Modern Style */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                {/* Recent Observations Table - Overhauled Style */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-12">
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                        <h3 className="text-lg font-bold text-gray-800">Historial de Observaciones</h3>
-                        <span className="text-sm text-gray-500">{stats.observationsList?.length || 0} registros</span>
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-50 bg-blue-500/10 rounded-lg">
+                                <Sun className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-800">Historial de Observaciones</h3>
+                                <p className="text-sm text-gray-500">{filteredObservations.length} de {recentObservations.length} registros cargados</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => {
+                                const tableData = filteredObservations.map(obs => ({
+                                    'Fecha': obs.date || new Date(obs.created_at).toLocaleDateString(),
+                                    'Turno': obs.shift,
+                                    'Observador': obs.profiles?.full_name,
+                                    'Grupo': obs.group_info,
+                                    'Sede': obs.site,
+                                    'Tipo': obs.observation_type,
+                                    'Operadores': obs.observation_records?.length
+                                }))
+                                const worksheet = XLSX.utils.json_to_sheet(tableData)
+                                const workbook = XLSX.utils.book_new()
+                                XLSX.utils.book_append_sheet(workbook, worksheet, "Historial")
+                                XLSX.writeFile(workbook, `Historial_${new Date().toISOString().split('T')[0]}.xlsx`)
+                            }}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition flex items-center shadow-sm"
+                        >
+                            <Download className="w-4 h-4 mr-2" /> Exportar Tabla
+                        </button>
                     </div>
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0 z-10">
-                                <tr>
-                                    <th className="px-6 py-3 font-bold">Fecha</th>
-                                    <th className="px-6 py-3 font-bold">Turno</th>
-                                    <th className="px-6 py-3 font-bold">Observador</th>
-                                    <th className="px-6 py-3 font-bold">Grupo</th>
-                                    <th className="px-6 py-3 font-bold">Sede</th>
-                                    <th className="px-6 py-3 font-bold">Tipo</th>
-                                    <th className="px-6 py-3 text-center font-bold"># Ops</th>
-                                    <th className="px-6 py-3 text-center font-bold">Estado</th>
-                                    <th className="px-6 py-3 text-center font-bold">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {loadingStats ? (
-                                    <tr>
-                                        <td colSpan="9" className="px-6 py-8 text-center text-gray-500 animate-pulse">
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                ) : stats.observationsList?.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="9" className="px-6 py-8 text-center text-gray-500">
-                                            No se encontraron observaciones con los filtros actuales.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    stats.observationsList.map((obs) => (
-                                        <tr key={obs.id} className="bg-white border-b hover:bg-gray-50">
-                                            <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                                {(() => {
-                                                    if (!obs.date) return new Date(obs.created_at).toLocaleDateString()
-                                                    // Parse YYYY-MM-DD manually to avoid timezone shift
-                                                    const parts = String(obs.date).split('T')[0].split('-')
-                                                    return `${parts[2]}/${parts[1]}/${parts[0]}`
-                                                })()}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
-                                                    {obs.shift || '-'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {obs.profiles?.full_name || 'Desconocido'}
-                                            </td>
-                                            <td className="px-6 py-4">{obs.group_info}</td>
-                                            <td className="px-6 py-4">{obs.site}</td>
-                                            <td className="px-6 py-4">{obs.observation_type}</td>
-                                            <td className="px-6 py-4 text-center font-bold text-gray-700">
-                                                {obs.observation_records?.length || 0}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${obs.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                    }`}>
-                                                    {obs.status === 'completed' ? 'Completada' : 'En Curso'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    {obs.status !== 'completed' && ['admin', 'observer', 'lider'].includes(user?.role) && (
-                                                        <Link
-                                                            to={`/observation/${obs.id}`}
-                                                            className="inline-flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors"
-                                                            title="Editar Observación"
-                                                        >
-                                                            <FileEdit className="w-5 h-5" />
-                                                        </Link>
-                                                    )}
 
-                                                    {(user?.role === 'admin' || user?.role === 'lider') && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={(e) => handleDelete(e, obs.id)}
-                                                            className="inline-flex items-center justify-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
-                                                            title="Eliminar Observación"
-                                                        >
-                                                            <Trash2 className="w-5 h-5" />
-                                                        </button>
-                                                    )}
+                    <div className="overflow-x-auto">
+                        <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
+                            <table className="w-full text-sm text-left border-collapse">
+                                <thead className="bg-gray-50 sticky top-0 z-20 shadow-sm border-b border-gray-200">
+                                    <tr>
+                                        {[
+                                            { header: 'Fecha', accessor: 'date' },
+                                            { header: 'Turno', accessor: 'shift' },
+                                            { header: 'Observador', accessor: 'full_name' },
+                                            { header: 'Grupo', accessor: 'group_info' },
+                                            { header: 'Sede', accessor: 'site' },
+                                            { header: 'Tipo', accessor: 'observation_type' },
+                                            { header: '# Ops', accessor: 'num_ops' },
+                                            { header: 'Estado', accessor: 'status' }
+                                        ].map((col, idx) => (
+                                            <th key={idx} className="px-6 py-4 font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap">
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <span>{col.header}</span>
+                                                    <ColumnFilter
+                                                        column={col}
+                                                        data={recentObservations.map(o => ({
+                                                            ...o,
+                                                            full_name: o.profiles?.full_name || 'Desconocido',
+                                                            num_ops: o.observation_records?.length || 0
+                                                        }))}
+                                                        filters={tableColumnFilters}
+                                                        onChange={(acc, val) => setTableColumnFilters(prev => ({ ...prev, [acc]: val }))}
+                                                    />
+                                                </div>
+                                            </th>
+                                        ))}
+                                        <th className="px-6 py-4 font-bold text-gray-700 uppercase tracking-wider text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {loadingObs ? (
+                                        <tr>
+                                            <td colSpan="9" className="px-6 py-12 text-center">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                                                    <p className="text-gray-500 font-medium">Cargando historial...</p>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ) : filteredObservations.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="px-6 py-12 text-center text-gray-500 bg-gray-50/30">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <Filter className="w-10 h-10 text-gray-300" />
+                                                    <p className="text-lg">No se encontraron observaciones</p>
+                                                    <button
+                                                        onClick={() => setTableColumnFilters({})}
+                                                        className="text-blue-600 font-bold hover:underline"
+                                                    >
+                                                        Limpiar todos los filtros de la tabla
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredObservations.map((obs) => (
+                                            <tr key={obs.id} className="hover:bg-blue-50/40 transition-colors group border-b border-gray-50">
+                                                <td className="px-6 py-4 font-bold text-gray-800 whitespace-nowrap">
+                                                    {(() => {
+                                                        const dateVal = obs.date || obs.created_at
+                                                        const parts = String(dateVal).split('T')[0].split('-')
+                                                        return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : String(dateVal)
+                                                    })()}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200">
+                                                        {obs.shift || '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 font-medium text-gray-600">
+                                                    {obs.profiles?.full_name || 'Desconocido'}
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-600">{obs.group_info}</td>
+                                                <td className="px-6 py-4 text-gray-600">{obs.site}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                                                        {obs.observation_type}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center font-black text-gray-700">
+                                                    {obs.observation_records?.length || 0}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${obs.status === 'completed' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
+                                                        }`}>
+                                                        {obs.status === 'completed' ? 'Completada' : 'En Curso'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        {obs.status !== 'completed' && ['admin', 'observer', 'lider'].includes(user?.role) && (
+                                                            <Link
+                                                                to={`/observation/${obs.id}`}
+                                                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm bg-white border border-blue-100"
+                                                                title="Editar"
+                                                            >
+                                                                <FileEdit className="w-4 h-4" />
+                                                            </Link>
+                                                        )}
+
+                                                        {(user?.role === 'admin' || user?.role === 'lider') && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => handleDelete(e, obs.id)}
+                                                                className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-white border border-red-100"
+                                                                title="Eliminar"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
