@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { Key, Save, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function ChangePasswordPage() {
-    const { user } = useAuth()
+    const { user, refreshProfile } = useAuth()
+    const navigate = useNavigate()
     const [passwords, setPasswords] = useState({
         newPassword: '',
         confirmPassword: ''
@@ -38,11 +39,11 @@ export default function ChangePasswordPage() {
         }
 
         try {
-            const { error } = await supabase.auth.updateUser({
+            const { error: authError } = await supabase.auth.updateUser({
                 password: passwords.newPassword
             })
 
-            if (error) throw error
+            if (authError) throw authError
 
             // Update profile MUST_CHANGE_PASSWORD to false
             const { error: profileError } = await supabase
@@ -52,8 +53,16 @@ export default function ChangePasswordPage() {
 
             if (profileError) console.error('Error clearing password change flag:', profileError)
 
-            setMsg('Contraseña actualizada con éxito.')
+            // Actualizar estado local para que ProtectedRoute libere el paso
+            if (refreshProfile) await refreshProfile()
+
+            setMsg('✅ Contraseña actualizada con éxito. Redirigiendo al inicio...')
             setPasswords({ newPassword: '', confirmPassword: '' })
+
+            // Redirigir tras 1.5 segundos
+            setTimeout(() => {
+                navigate('/')
+            }, 1500)
 
         } catch (err) {
             let userFriendlyError = err.message
