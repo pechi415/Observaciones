@@ -44,6 +44,14 @@ export default function ChangePasswordPage() {
 
             if (error) throw error
 
+            // Update profile MUST_CHANGE_PASSWORD to false
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ must_change_password: false })
+                .eq('id', user.id)
+
+            if (profileError) console.error('Error clearing password change flag:', profileError)
+
             setMsg('Contraseña actualizada con éxito.')
             setPasswords({ newPassword: '', confirmPassword: '' })
 

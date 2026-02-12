@@ -21,7 +21,8 @@ export const AuthProvider = ({ children }) => {
                 role: sessionUser.user_metadata?.role || 'observer', // Default a observer si no hay rol
                 site: sessionUser.user_metadata?.site || '',
                 group: sessionUser.user_metadata?.group || '',
-                full_name: sessionUser.user_metadata?.full_name || sessionUser.email
+                full_name: sessionUser.user_metadata?.full_name || sessionUser.email,
+                must_change_password: sessionUser.user_metadata?.must_change_password ?? false
             }
         }
 

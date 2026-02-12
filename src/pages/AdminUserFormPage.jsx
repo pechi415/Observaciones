@@ -148,7 +148,8 @@ export default function AdminUserFormPage() {
                             role: formData.role,
                             observer_id: formData.observerId, // Critical for DB constraints
                             site_default: formData.site,
-                            group_default: formData.group
+                            group_default: formData.group,
+                            must_change_password: true
                         }
                     }
                 })
@@ -157,8 +158,6 @@ export default function AdminUserFormPage() {
 
                 if (authData.user) {
                     // 3. Actualizar perfil con los datos extra
-                    // 3. Actualizar perfil con los datos extra
-                    // Usamos UPSERT para garantizar que se guarden los datos
                     const { error: profileError } = await supabase
                         .from('profiles')
                         .upsert({
@@ -168,7 +167,8 @@ export default function AdminUserFormPage() {
                             observer_id: formData.observerId,
                             site_default: formData.site,
                             group_default: formData.group,
-                            role: formData.role // Use selected role
+                            role: formData.role,
+                            must_change_password: true
                         })
 
                     if (profileError) {
