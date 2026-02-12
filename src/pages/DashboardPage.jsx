@@ -495,11 +495,22 @@ export default function DashboardPage() {
                 title = 'Operadores Observados'
                 data = stats.operatorList
                 columns = [
-                    { header: 'Sede', accessor: 'site' },
+                    {
+                        header: 'Sede',
+                        accessor: 'site',
+                        render: (row) => (
+                            <span className="text-xs font-semibold px-2 py-1 bg-gray-50 text-gray-600 rounded border border-gray-100 uppercase tracking-tight">
+                                {row.site}
+                            </span>
+                        )
+                    },
                     { header: 'Grupo', accessor: 'group' },
                     { header: 'Operador', accessor: 'operator' },
-                    // "Cantidad" column logic handled by passing the object with 'count' property
-                    { header: 'Cantidad', accessor: 'count' }
+                    {
+                        header: 'Cantidad',
+                        accessor: 'count',
+                        render: (row) => <span className="font-black text-gray-800">{row.count}</span>
+                    }
                 ]
                 break;
             case 'deviations':
@@ -510,31 +521,97 @@ export default function DashboardPage() {
                         header: 'Fecha',
                         accessor: 'date',
                         render: (row) => {
-                            // Display date as is from the string to avoid timezone backward shift
-                            // e.g., "2026-02-10" displayed as "10/02/2026"
                             if (!row.date) return 'N/A'
                             const parts = String(row.date).split('T')[0].split('-')
-                            return `${parts[2]}/${parts[1]}/${parts[0]}`
+                            return <span className="font-bold text-gray-700">{`${parts[2]}/${parts[1]}/${parts[0]}`}</span>
                         }
                     },
-                    { header: 'Sede', accessor: 'site' },
+                    {
+                        header: 'Sede',
+                        accessor: 'site',
+                        render: (row) => (
+                            <span className="text-xs font-semibold px-2 py-1 bg-gray-50 text-gray-600 rounded">
+                                {row.site}
+                            </span>
+                        )
+                    },
                     { header: 'Grupo', accessor: 'group' },
-                    { header: 'Observador', accessor: 'observer' }, // NEW Column
+                    { header: 'Observador', accessor: 'observer' },
                     { header: 'Operador', accessor: 'operator' },
-                    { header: 'Item Fallido', accessor: 'item' }, // Question/Item text
-                    { header: 'Comentarios', accessor: 'comments' } // NEW Column
+                    {
+                        header: 'Item Fallido',
+                        accessor: 'item',
+                        render: (row) => <span className="text-red-600 font-medium">{row.item}</span>
+                    },
+                    {
+                        header: 'Comentarios',
+                        accessor: 'comments',
+                        render: (row) => <span className="text-xs text-gray-500 italic max-w-xs truncate block">{row.comments || '-'}</span>
+                    }
                 ]
                 break;
             case 'total':
                 title = 'Total Observaciones'
                 data = stats.observationsList
                 columns = [
-                    { header: 'Fecha', accessor: 'date', render: (row) => new Date(row.date).toLocaleDateString() },
-                    { header: 'Turno', accessor: 'shift' },
+                    {
+                        header: 'Fecha',
+                        accessor: 'date',
+                        render: (row) => {
+                            const dateVal = row.date || row.created_at
+                            const parts = String(dateVal).split('T')[0].split('-')
+                            return <span className="font-bold text-gray-800">{`${parts[2]}/${parts[1]}/${parts[0]}`}</span>
+                        }
+                    },
+                    {
+                        header: 'Turno',
+                        accessor: 'shift',
+                        render: (row) => (
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-gray-100 text-gray-700 border border-gray-200 uppercase">
+                                {row.shift || '-'}
+                            </span>
+                        )
+                    },
                     { header: 'Sede', accessor: 'site' },
                     { header: 'Grupo', accessor: 'group_info' },
                     { header: 'Observador', accessor: 'profiles', render: (row) => row.profiles?.full_name || 'N/A' },
-                    { header: 'Estado', accessor: 'status', render: (row) => row.status === 'completed' ? 'Completada' : 'En Curso' }
+                    {
+                        header: 'Estado',
+                        accessor: 'status',
+                        render: (row) => (
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${row.status === 'completed' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
+                                }`}>
+                                {row.status === 'completed' ? 'Completada' : 'En Curso'}
+                            </span>
+                        )
+                    },
+                    {
+                        header: 'Acciones',
+                        accessor: 'actions',
+                        render: (row) => (
+                            <div className="flex items-center gap-2">
+                                {row.status !== 'completed' && ['admin', 'observer', 'lider'].includes(user?.role) && (
+                                    <Link
+                                        to={`/observation/${row.id}`}
+                                        className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                                        title="Editar"
+                                    >
+                                        <FileEdit className="w-3.5 h-3.5" />
+                                    </Link>
+                                )}
+                                {(user?.role === 'admin' || user?.role === 'lider') && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => handleDelete(e, row.id)}
+                                        className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
+                                        title="Eliminar"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                            </div>
+                        )
+                    }
                 ]
                 break;
             default:
