@@ -1,5 +1,5 @@
 import Layout from '../components/Layout'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
 import KPIDetailModal from '../components/KPIDetailModal'
 import {
@@ -43,6 +43,7 @@ import { ColumnFilter } from '../components/ColumnFilter'
 
 export default function DashboardPage() {
     const { user } = useAuth()
+    const navigate = useNavigate()
     const [recentObservations, setRecentObservations] = useState([])
     const [loadingObs, setLoadingObs] = useState(true)
 
@@ -158,6 +159,28 @@ export default function DashboardPage() {
         const tableElement = document.querySelector('table');
         if (tableElement) {
             tableElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    const handleNewObservation = async () => {
+        if (!user) return
+
+        try {
+            setLoadingObs(true)
+            const activeObs = await observationService.getActiveObservation(user.id)
+
+            if (activeObs) {
+                if (window.confirm(`Ya tienes una observación en curso iniciada el ${new Date(activeObs.date).toLocaleDateString()}. \n\nDebes finalizarla o eliminarla para poder iniciar una nueva. \n\n¿Deseas ir a la observación abierta ahora?`)) {
+                    navigate(`/observation/${activeObs.id}`)
+                }
+            } else {
+                navigate('/observation/new')
+            }
+        } catch (error) {
+            console.error('Error checking active observation:', error)
+            alert('Error al verificar observaciones activas')
+        } finally {
+            setLoadingObs(false)
         }
     }
 
@@ -682,13 +705,13 @@ export default function DashboardPage() {
 
                         {/* New Observation Button - Only for Admin and Observer and Lider */}
                         {user?.role && ['admin', 'observer', 'lider'].includes(user.role) && (
-                            <Link
-                                to="/observation/new"
+                            <button
+                                onClick={handleNewObservation}
                                 className="flex items-center gap-2 bg-[#E31937] text-white px-4 py-2 rounded-lg hover:bg-[#CA0926] transition-colors shadow-sm"
                             >
                                 <PlusCircle className="w-5 h-5" />
                                 <span className="font-bold hidden sm:inline">Nueva Observación</span>
-                            </Link>
+                            </button>
                         )}
                     </div>
                 </div>

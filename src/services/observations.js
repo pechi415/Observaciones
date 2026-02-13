@@ -30,6 +30,21 @@ export const observationService = {
     },
 
     /**
+     * Busca si el usuario ya tiene una observación en curso.
+     */
+    async getActiveObservation(userId) {
+        const { data, error } = await supabase
+            .from('observations')
+            .select('*')
+            .eq('supervisor_id', userId)
+            .eq('status', 'in_progress')
+            .maybeSingle()
+
+        if (error) throw error
+        return data
+    },
+
+    /**
      * Agrega el registro de un operador a una observación existente.
      */
     async addRecord(observationId, operatorData) {

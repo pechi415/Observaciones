@@ -43,10 +43,11 @@ export default function ObservationPage() {
     const [operators, setOperators] = useState([])
     const [editingOperator, setEditingOperator] = useState(null) // Operador en edición
 
-    // Cargar datos si estamos en modo edición (URL)
+    // Cargar datos si estamos en modo edición (URL) o verificar si ya hay uno activo
     useEffect(() => {
-        if (id) {
-            const loadObservation = async () => {
+        const checkExisting = async () => {
+            if (id) {
+                // MODO EDICIÓN
                 setLoading(true)
                 try {
                     const data = await observationService.getById(id)
@@ -56,22 +57,36 @@ export default function ObservationPage() {
                             date: data.date,
                             shift: data.shift,
                             site: data.site,
-                            group: data.group_info, // Map DB group_info -> UI group
-                            observationType: data.observation_type // Map DB observation_type -> UI observationType
+                            group: data.group_info,
+                            observationType: data.observation_type
                         })
                         setOperators(data.observation_records || [])
-                        setLocked(true) // Lock header automatically
+                        setLocked(true)
                     }
                 } catch (err) {
                     console.error('Error loading observation:', err)
-                    setError('Error cargando la observación. Puede que no exista o no tengas permisos.')
+                    setError('Error cargando la observación.')
+                } finally {
+                    setLoading(false)
+                }
+            } else if (user) {
+                // MODO NUEVO - Verificar si ya tiene uno en curso
+                try {
+                    setLoading(true)
+                    const activeObs = await observationService.getActiveObservation(user.id)
+                    if (activeObs) {
+                        // Ya tiene uno activo, redirigir
+                        navigate(`/observation/${activeObs.id}`, { replace: true })
+                    }
+                } catch (err) {
+                    console.error('Error checking active:', err)
                 } finally {
                     setLoading(false)
                 }
             }
-            loadObservation()
         }
-    }, [id])
+        checkExisting()
+    }, [id, user, navigate])
 
     // Efecto para verificar si faltan datos en el perfil
     useEffect(() => {
