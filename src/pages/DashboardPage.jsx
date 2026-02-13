@@ -780,30 +780,36 @@ export default function DashboardPage() {
 
 
                 {/* Stats Cards - Modern Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
                         { title: 'Total Observaciones', value: stats.total, icon: FileEdit, color: 'blue', onClick: scrollToTable },
                         { title: 'Operadores Observados', value: stats.totalOperators, icon: Users, color: 'emerald', onClick: () => openModal('operators') },
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
                     ].map((card, idx) => (
-                        <div key={idx} onClick={card.onClick} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:shadow-md transition-shadow group relative overflow-hidden h-24">
-                            {/* Interactive Indicator Icon (Top Right) */}
-                            {['Operadores Observados', 'Desviaciones Detectadas'].includes(card.title) && (
-                                <div className="absolute top-2 right-2 text-gray-200 group-hover:text-blue-400 transition-colors">
-                                    <List className="w-4 h-4" />
+                        <div key={idx} onClick={card.onClick} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow group relative overflow-hidden">
+                            {/* Decorative background element for interactive cards */}
+                            {card.onClick && card.title !== 'Seguridad Global' && card.title !== 'Total Observaciones' && (
+                                <div className={`absolute top-0 right-0 p-1.5 bg-${card.color}-50 text-${card.color}-400 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-all`}>
+                                    <List className="w-3.5 h-3.5" />
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2.5 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-105 transition-transform`}>
-                                    <card.icon className="w-5 h-5" />
+                            <div className="flex items-center gap-4">
+                                <div className={`p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform`}>
+                                    <card.icon className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-gray-800 leading-tight">{card.value}</h3>
-                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{card.title}</p>
+                                    <h3 className="text-2xl font-black text-gray-800 mb-0">{card.value}</h3>
+                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{card.title}</p>
                                 </div>
                             </div>
+
+                            {card.onClick && card.title !== 'Seguridad Global' && card.title !== 'Total Observaciones' && (
+                                <div className="text-gray-300 group-hover:text-blue-500 transition-colors shrink-0">
+                                    <List className="w-5 h-5 opacity-40 group-hover:opacity-100" />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
