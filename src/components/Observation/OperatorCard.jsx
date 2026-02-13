@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Check, X } from 'lucide-react' // AlertTriangle removed
+import { Check, X, Search } from 'lucide-react'
 import { OBSERVATION_QUESTIONS } from '../../constants'
 import { operatorService } from '../../services/operators'
 
 export default function OperatorCard({ onSave, onCancel, initialData = null, observationType, selectedSite, selectedGroup }) {
     const [operatorName, setOperatorName] = useState('')
+    const [searchTerm, setSearchTerm] = useState('')
     const [checklist, setChecklist] = useState({})
     const [comments, setComments] = useState('Sin comentarios')
 
@@ -13,6 +13,11 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
 
     const [operatorsList, setOperatorsList] = useState([])
     const [loadingOps, setLoadingOps] = useState(false)
+
+    // Filtro reactivo para la búsqueda
+    const filteredOperators = (operatorsList || []).filter(op =>
+        op.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
     // Fetch operators when site/group changes
     useEffect(() => {
@@ -40,9 +45,11 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
             setOperatorName(initialData.operator_name)
             setChecklist(initialData.checklist || {})
             setComments(initialData.comments || '')
+            setSearchTerm('')
         } else {
             // Reset y Default a "SI" para nuevas preguntas
             setOperatorName('')
+            setSearchTerm('')
             const defaultChecklist = questions.reduce((acc, item) => ({ ...acc, [item.id]: 'Si' }), {})
             setChecklist(defaultChecklist)
             setComments('Sin comentarios')
@@ -64,6 +71,7 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
 
         if (!initialData) {
             setOperatorName('')
+            setSearchTerm('')
             const defaultChecklist = questions.reduce((acc, item) => ({ ...acc, [item.id]: 'Si' }), {})
             setChecklist(defaultChecklist)
             setComments('Sin comentarios')
@@ -86,9 +94,20 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
             </div>
 
             <div className="p-6 space-y-6">
-                {/* Nombre del Operador */}
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">Operador</label>
+                    <div className="relative mb-2">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                    </div>
                     <select
                         value={operatorName}
                         onChange={(e) => setOperatorName(e.target.value)}
@@ -98,7 +117,7 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
                         <option value="">
                             {loadingOps ? 'Cargando operadores...' : '-- Seleccione Operador --'}
                         </option>
-                        {operatorsList.map((op) => (
+                        {filteredOperators.map((op) => (
                             <option key={op.id || op.name} value={op.name}>
                                 {op.name}
                             </option>
