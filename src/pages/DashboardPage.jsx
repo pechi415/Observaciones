@@ -794,8 +794,8 @@ export default function DashboardPage() {
                                     <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 <div className="min-w-0 flex flex-col justify-center">
-                                    <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-0.5 leading-none">{card.value}</h3>
-                                    <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-tighter sm:tracking-normal leading-[1.1]">
+                                    <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-0 leading-none">{card.value}</h3>
+                                    <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-tight whitespace-nowrap">
                                         {card.title}
                                     </p>
                                 </div>
