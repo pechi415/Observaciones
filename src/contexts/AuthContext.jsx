@@ -8,6 +8,7 @@ export const useAuth = () => useContext(AuthContext)
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [showReset, setShowReset] = useState(false)
 
     // Función rápida: Mapear datos de sesión sin esperar DB
     const mapSessionToUser = (sessionUser) => {
@@ -127,32 +128,32 @@ export const AuthProvider = ({ children }) => {
     }), [user, loading])
 
     // Safety timeout: stop loading after 3 seconds if Supabase hangs
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (loading) {
-                console.error('AuthContext: Safety timeout triggered (8s) - Forcing loading=false. Supabase might be unreachable.')
-                setLoading(false)
-            }
-        }, 8000)
-        return () => clearTimeout(timer)
-    }, [])
+    const timer = setTimeout(() => {
+        if (mounted && loading) {
+            console.error('AuthContext: Safety timeout triggered (8s) - Showing Reset Option.')
+            setShowReset(true)
+            // We keep loading=true to show the UI with the button
+        }
+    }, 8000)
+    return () => clearTimeout(timer)
+}, [])
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-                <div className="text-center w-full max-w-md">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-500 font-medium mb-4">Cargando sistema...</p>
-
-
-                </div>
-            </div>
-        )
-    }
-
+if (loading) {
     return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <div className="text-center w-full max-w-md">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-500 font-medium mb-4">Cargando sistema...</p>
+
+
+            </div>
+        </div>
     )
+}
+
+return (
+    <AuthContext.Provider value={value}>
+        {children}
+    </AuthContext.Provider>
+)
 }

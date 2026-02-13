@@ -37,17 +37,17 @@ export default function LoginPage() {
             // Convertir ID a Email falso
             const syntheticEmail = `${email}@sistema.com`
 
-            // Timeout desactivado para conexiones lentas
-            // const timeoutPromise = new Promise((_, reject) =>
-            //     setTimeout(() => reject(new Error('Tiempo de espera agotado. Revisa tu conexión.')), 5000)
-            // )
+            // Límite de tiempo para la conexión (12 segundos)
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Tiempo de espera agotado. El servidor no responde.')), 12000)
+            )
 
             setStatusMsg('Verificando credenciales...')
-            // const { error: signInError } = await Promise.race([
-            //     signIn({ email: syntheticEmail, password }),
-            //     timeoutPromise
-            // ])
-            const { error: signInError } = await signIn({ email: syntheticEmail, password })
+
+            const { error: signInError } = await Promise.race([
+                signIn({ email: syntheticEmail, password }),
+                timeoutPromise
+            ])
 
             if (signInError) {
                 setStatusMsg('')
