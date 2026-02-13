@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Check, X, Search } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { Check, X, Search, ChevronDown } from 'lucide-react'
 import { OBSERVATION_QUESTIONS } from '../../constants'
 import { operatorService } from '../../services/operators'
 
 export default function OperatorCard({ onSave, onCancel, initialData = null, observationType, selectedSite, selectedGroup }) {
     const [operatorName, setOperatorName] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
     const [checklist, setChecklist] = useState({})
     const [comments, setComments] = useState('Sin comentarios')
 
@@ -15,10 +17,23 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
     const [operatorsList, setOperatorsList] = useState([])
     const [loadingOps, setLoadingOps] = useState(false)
 
+    // Click outside handler
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
     // Filtro reactivo para la búsqueda
-    const filteredOperators = (operatorsList || []).filter(op =>
-        op.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredOperators = useMemo(() => {
+        return (operatorsList || []).filter(op =>
+            op.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [operatorsList, searchTerm])
 
     // Fetch operators when site/group changes
     useEffect(() => {
@@ -95,37 +110,66 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
             </div>
 
             <div className="p-6 space-y-6">
-                <div>
+                <div className="relative" ref={dropdownRef}>
                     <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">Operador</label>
-                    <div className="relative mb-2">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Buscar por nombre..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                    </div>
-                    <select
-                        value={operatorName}
-                        onChange={(e) => setOperatorName(e.target.value)}
-                        disabled={loadingOps}
-                        className="block w-full text-lg p-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
+                    <button
+                        type="button"
+                        onClick={() => !loadingOps && setIsOpen(!isOpen)}
+                        className={`flex w-full items-center justify-between text-left px-4 py-3 bg-white border rounded-xl shadow-sm transition-all outline-none focus:ring-2 focus:ring-blue-500/20 ${isOpen ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200'} ${loadingOps ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
-                        <option value="">
-                            {loadingOps ? 'Cargando operadores...' : '-- Seleccione Operador --'}
-                        </option>
-                        {filteredOperators.map((op) => (
-                            <option key={op.id || op.name} value={op.name}>
-                                {op.name}
-                            </option>
-                        ))}
-                    </select>
+                        <span className={`text-lg transition-colors ${operatorName ? 'text-gray-900 font-bold' : 'text-gray-400 font-medium'}`}>
+                            {loadingOps ? 'Cargando operadores...' : (operatorName || '-- Seleccione Operador --')}
+                        </span>
+                        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} />
+                    </button>
+
+                    {isOpen && (
+                        <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            {/* Search inside dropdown */}
+                            <div className="p-3 border-b bg-gray-50/50">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por nombre..."
+                                        className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        autoFocus
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Options list */}
+                            <div className="max-h-60 overflow-y-auto custom-scrollbar p-1">
+                                {filteredOperators.length > 0 ? (
+                                    filteredOperators.map((op) => (
+                                        <button
+                                            key={op.id || op.name}
+                                            type="button"
+                                            className={`flex items-center justify-between w-full px-4 py-3 text-sm rounded-lg transition-colors mb-0.5 ${operatorName === op.name ? 'bg-blue-600 text-white font-bold' : 'text-gray-700 hover:bg-blue-50'}`}
+                                            onClick={() => {
+                                                setOperatorName(op.name)
+                                                setIsOpen(false)
+                                                setSearchTerm('')
+                                            }}
+                                        >
+                                            <span>{op.name}</span>
+                                            {operatorName === op.name && <Check className="w-4 h-4" />}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="p-8 text-center">
+                                        <p className="text-sm font-medium text-gray-400">No se encontraron resultados</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {!loadingOps && operatorsList.length === 0 && (
-                        <p className="text-red-500 text-xs mt-1">
+                        <p className="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider pl-1">
                             No se encontraron operadores para {selectedSite} - Grupo {selectedGroup}
                         </p>
                     )}
