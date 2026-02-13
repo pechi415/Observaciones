@@ -790,12 +790,12 @@ export default function DashboardPage() {
                         <div key={idx} onClick={card.onClick} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:shadow-md transition-all group relative overflow-hidden h-fit sm:min-h-[110px]">
 
                             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 pr-4 sm:pr-6">
-                                <div className={`p-2.5 sm:p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform shrink-0`}>
-                                    <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                <div className={`p-3 sm:p-3.5 rounded-2xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform shrink-0 shadow-sm border border-${card.color}-100/50`}>
+                                    <card.icon className="w-6 h-6 sm:w-8 sm:h-8" />
                                 </div>
                                 <div className="min-w-0 flex flex-col justify-center">
-                                    <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-0 leading-none">{card.value}</h3>
-                                    <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-tight whitespace-nowrap">
+                                    <h3 className="text-2xl sm:text-3xl font-black text-gray-800 mb-1 sm:mb-2 leading-none tracking-tight">{card.value}</h3>
+                                    <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-tight sm:tracking-widest whitespace-nowrap">
                                         {card.title}
                                     </p>
                                 </div>
