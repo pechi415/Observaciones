@@ -134,7 +134,6 @@ export const observationService = {
             .from('observations')
             .select(`
                 id,
-                created_at,
                 date,
                 shift,
                 site,
@@ -142,13 +141,8 @@ export const observationService = {
                 observation_type,
                 supervisor_id,
                 status,
-                profiles (full_name),
-                observation_records (
-                    id,
-                    operator_name,
-                    checklist,
-                    comments
-                )
+                profiles(full_name),
+                observation_records(id, operator_name, checklist)
             `)
             .order('created_at', { ascending: false })
             .limit(1000)
