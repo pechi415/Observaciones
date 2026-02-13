@@ -787,23 +787,23 @@ export default function DashboardPage() {
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
                     ].map((card, idx) => (
-                        <div key={idx} onClick={card.onClick} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:shadow-md transition-all group relative overflow-hidden h-fit sm:min-h-[110px]">
+                        <div key={idx} onClick={card.onClick} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all group relative overflow-hidden h-fit sm:h-24">
 
-                            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 pr-4 sm:pr-6">
-                                <div className={`p-3 sm:p-3.5 rounded-2xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform shrink-0 shadow-sm border border-${card.color}-100/50`}>
-                                    <card.icon className="w-6 h-6 sm:w-8 sm:h-8" />
+                            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 pr-6">
+                                <div className={`p-2.5 sm:p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform shrink-0`}>
+                                    <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
-                                <div className="min-w-0 flex flex-col justify-center">
-                                    <h3 className="text-2xl sm:text-3xl font-black text-gray-800 mb-1 sm:mb-2 leading-none tracking-tight">{card.value}</h3>
-                                    <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-tight sm:tracking-widest whitespace-nowrap">
+                                <div className="min-w-0">
+                                    <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-0 leading-tight">{card.value}</h3>
+                                    <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-widest whitespace-nowrap overflow-hidden">
                                         {card.title}
                                     </p>
                                 </div>
                             </div>
 
                             {card.onClick && card.title !== 'Seguridad Global' && (
-                                <div className="absolute top-2.5 right-2.5 text-blue-400 group-hover:text-blue-600 transition-colors shrink-0">
-                                    <List className="w-4 h-4 sm:w-5 sm:h-5 opacity-30 group-hover:opacity-100" />
+                                <div className="absolute top-2 right-2 text-blue-400/30 group-hover:text-blue-500 transition-colors shrink-0">
+                                    <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </div>
                             )}
                         </div>
