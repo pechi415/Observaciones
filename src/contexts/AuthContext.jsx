@@ -56,7 +56,12 @@ export const AuthProvider = ({ children }) => {
 
         const initializeAuth = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession()
+                console.log('AuthContext: Initializing (Project ID: lmvgwmekjmbmrvhminjr)')
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+                if (sessionError) {
+                    console.error('AuthContext: getSession error:', sessionError)
+                }
 
                 if (mounted) {
                     if (session?.user) {
@@ -124,8 +129,10 @@ export const AuthProvider = ({ children }) => {
     // Safety timeout: stop loading after 3 seconds if Supabase hangs
     useEffect(() => {
         const timer = setTimeout(() => {
-            console.log('AuthContext: Safety timeout triggered (8s)')
-            setLoading(false)
+            if (loading) {
+                console.error('AuthContext: Safety timeout triggered (8s) - Forcing loading=false. Supabase might be unreachable.')
+                setLoading(false)
+            }
         }, 8000)
         return () => clearTimeout(timer)
     }, [])

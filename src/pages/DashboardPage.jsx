@@ -154,6 +154,13 @@ export default function DashboardPage() {
         }
     }
 
+    const scrollToTable = () => {
+        const tableElement = document.querySelector('table');
+        if (tableElement) {
+            tableElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
     const handleDelete = async (e, id) => {
         if (e && e.stopPropagation) e.stopPropagation();
         if (e && e.preventDefault) e.preventDefault();
@@ -775,7 +782,7 @@ export default function DashboardPage() {
                 {/* Stats Cards - Modern Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
-                        { title: 'Total Observaciones', value: stats.total, icon: FileEdit, color: 'blue', onClick: () => scrollToTable() },
+                        { title: 'Total Observaciones', value: stats.total, icon: FileEdit, color: 'blue', onClick: scrollToTable },
                         { title: 'Operadores Observados', value: stats.totalOperators, icon: Users, color: 'emerald', onClick: () => openModal('operators') },
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
