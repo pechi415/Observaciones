@@ -697,17 +697,17 @@ export default function DashboardPage() {
                 {/* Filters Section - Fixed & Styled - Single Line */}
                 {/* Placeholder height div to prevent content jump when filters are fixed */}
                 {/* Filters Section - Sticky & Styled - Single Line */}
-                <div className="sticky top-4 z-40 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-md border border-white/20 mb-6 transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="sticky top-4 z-40 bg-white/80 backdrop-blur-md p-3 sm:p-4 rounded-xl shadow-md border border-white/20 mb-6 transition-all duration-300 flex flex-row items-center justify-between gap-4 overflow-x-auto custom-scrollbar no-scrollbar">
                     <div className="flex flex-row items-center gap-2 shrink-0">
-                        <Filter className="w-5 h-5 text-blue-600" />
-                        <h3 className="font-bold text-gray-800 text-lg whitespace-nowrap">Filtros de Análisis</h3>
+                        <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                        <h3 className="font-bold text-gray-800 text-sm sm:text-lg whitespace-nowrap">Filtros</h3>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-center w-full justify-end">
+                    <div className="flex flex-row flex-nowrap gap-3 items-center shrink-0">
                         {/* Date Range */}
-                        <div className="w-full sm:w-auto flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-3 h-10 shadow-sm focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-                            <Calendar className="w-4 h-4 text-blue-500 mr-1" />
-                            <div className="relative w-24">
+                        <div className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-3 h-10 shadow-sm focus-within:ring-2 focus-within:ring-blue-100 transition-all shrink-0">
+                            <Calendar className="w-4 h-4 text-blue-500 mr-1 hidden xs:block" />
+                            <div className="relative w-20 sm:w-24">
                                 <input
                                     type="text"
                                     name="startDate"
@@ -715,12 +715,12 @@ export default function DashboardPage() {
                                     onChange={(e) => handleFilterChange('startDate', e.target.value)}
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => (e.target.type = filters.startDate ? "date" : "text")}
-                                    className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
+                                    className="w-full text-xs sm:text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
                                     placeholder="Desde"
                                 />
                             </div>
                             <span className="text-gray-300">|</span>
-                            <div className="relative w-24">
+                            <div className="relative w-20 sm:w-24">
                                 <input
                                     type="text"
                                     name="endDate"
@@ -728,7 +728,7 @@ export default function DashboardPage() {
                                     onChange={(e) => handleFilterChange('endDate', e.target.value)}
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => (e.target.type = filters.endDate ? "date" : "text")}
-                                    className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
+                                    className="w-full text-xs sm:text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
                                     placeholder="Hasta"
                                 />
                             </div>
@@ -740,7 +740,7 @@ export default function DashboardPage() {
                             selected={filters.shift}
                             onChange={(val) => handleFilterChange('shift', val)}
                             icon={Filter}
-                            className="shadow-sm h-10 w-full sm:w-auto"
+                            className="shadow-sm h-10 w-24 sm:w-auto"
                         />
 
                         <MultiSelectFilter
@@ -749,7 +749,7 @@ export default function DashboardPage() {
                             selected={filters.site}
                             onChange={(val) => handleFilterChange('site', val)}
                             icon={Filter}
-                            className="shadow-sm h-10 w-full sm:w-auto"
+                            className="shadow-sm h-10 w-24 sm:w-auto"
                         />
 
                         <MultiSelectFilter
@@ -758,19 +758,18 @@ export default function DashboardPage() {
                             selected={filters.group}
                             onChange={(val) => handleFilterChange('group', val)}
                             icon={Filter}
-                            className="shadow-sm h-10 w-full sm:w-auto"
+                            className="shadow-sm h-10 w-24 sm:w-auto"
                         />
 
                         {/* Clear Button - Fixed width, centered or next to last item */}
-                        <div className="flex justify-center sm:justify-start lg:block w-full sm:w-auto">
+                        <div className="flex shrink-0">
                             {(filters.startDate || filters.endDate || filters.shift.length > 0 || filters.site.length > 0 || filters.group.length > 0) && (
                                 <button
                                     onClick={clearFilters}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors flex items-center justify-center border border-red-100 lg:border-none w-full sm:w-auto"
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors flex items-center justify-center border border-red-100 lg:border-none"
                                     title="Limpiar Filtros"
                                 >
                                     <X className="w-5 h-5" />
-                                    <span className="sm:hidden ml-2 text-sm font-medium">Limpiar</span>
                                 </button>
                             )}
                         </div>
