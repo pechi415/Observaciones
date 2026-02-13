@@ -151,6 +151,7 @@ export const observationService = {
                 )
             `)
             .order('created_at', { ascending: false })
+            .limit(1000)
 
         // Apply DB Filters
         if (filters.startDate) query = query.gte('date', filters.startDate)
@@ -405,6 +406,7 @@ export const observationService = {
                     checklist
                 )
             `)
+            .limit(1000)
 
         // Apply Base Filters (Date, Site, Shift) but NOT Group
         if (baseFilters.startDate) query = query.gte('date', baseFilters.startDate)
