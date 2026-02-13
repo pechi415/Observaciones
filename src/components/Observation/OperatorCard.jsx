@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Check, X, Search } from 'lucide-react'
 import { OBSERVATION_QUESTIONS } from '../../constants'
 import { operatorService } from '../../services/operators'
