@@ -476,7 +476,7 @@ export default function DashboardPage() {
     const opsVsObserversData = {
         labels: observersRaw.labels,
         datasets: [{
-            label: 'Operadores Únicos',
+            label: 'Operadores',
             data: observersRaw.uniqueOperators,
             backgroundColor: '#22D3EE', // Cyan-400
             borderRadius: 4
