@@ -40,7 +40,8 @@ export default function ChangePasswordPage() {
 
         try {
             const { error: authError } = await supabase.auth.updateUser({
-                password: passwords.newPassword
+                password: passwords.newPassword,
+                data: { must_change_password: false }
             })
 
             if (authError) throw authError
