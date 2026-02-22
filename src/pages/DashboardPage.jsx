@@ -842,9 +842,9 @@ export default function DashboardPage() {
                                 <div className={`p-2.5 sm:p-3 rounded-xl bg-${card.color}-50 text-${card.color}-500 group-hover:scale-110 transition-transform shrink-0`}>
                                     <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
-                                <div className="min-w-0">
-                                    <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-0 leading-tight">{card.value}</h3>
-                                    <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-tighter whitespace-nowrap">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-800 mb-0 leading-tight">{card.value}</h3>
+                                    <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-tight mt-0.5 max-w-full">
                                         {card.title}
                                     </p>
                                 </div>
