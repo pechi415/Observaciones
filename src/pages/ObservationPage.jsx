@@ -141,6 +141,17 @@ export default function ObservationPage() {
                 return
             }
 
+            // Validación de Fecha (Mes actual para observer/lider)
+            const isRestrictedRole = user?.role === 'observer' || user?.role === 'lider'
+            if (isRestrictedRole && sessionData.date) {
+                const selectedDate = new Date(sessionData.date + 'T00:00:00') // Evitar problemas de zona horaria
+                const today = new Date()
+                if (selectedDate.getFullYear() !== today.getFullYear() || selectedDate.getMonth() !== today.getMonth()) {
+                    setError('Solo puedes ingresar observaciones con fecha del mes actual.')
+                    return
+                }
+            }
+
             try {
                 setLoading(true)
                 setError(null)

@@ -7,10 +7,16 @@ export default function SessionHeader({ sessionData, setSessionData, locked, set
     const { user } = useAuth()
     const [isExpanded, setIsExpanded] = useState(true)
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setSessionData(prev => ({ ...prev, [name]: value }))
-    }
+    // Calculate start and end of current month
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const lastDay = new Date(year, today.getMonth() + 1, 0).getDate()
+
+    const firstDayOfMonthStr = `${year}-${month}-01`
+    const lastDayOfMonthStr = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
+
+    const isRestrictedRole = user?.role === 'observer' || user?.role === 'lider'
 
     const toggleExpand = () => setIsExpanded(!isExpanded)
 
@@ -37,6 +43,8 @@ export default function SessionHeader({ sessionData, setSessionData, locked, set
                             value={sessionData.date}
                             onChange={handleChange}
                             disabled={locked}
+                            min={isRestrictedRole ? firstDayOfMonthStr : undefined}
+                            max={isRestrictedRole ? lastDayOfMonthStr : undefined}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                         />
                     </div>
