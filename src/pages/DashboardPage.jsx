@@ -828,10 +828,11 @@ export default function DashboardPage() {
 
 
                 {/* Stats Cards - Modern Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                     {[
                         { title: 'Total Observaciones', value: stats.total, icon: FileEdit, color: 'blue', onClick: scrollToTable },
                         { title: 'Operadores Observados', value: stats.totalOperators, icon: Users, color: 'emerald', onClick: () => openModal('operators') },
+                        { title: 'No Observados', value: stats.totalUnobservedOperators || 0, icon: UserCheck, color: 'orange', onClick: () => openModal('unobserved') },
                         { title: 'Desviaciones Detectadas', value: stats.totalDeviations, icon: AlertTriangle, color: 'amber', onClick: () => openModal('deviations') },
                         { title: 'Seguridad Global', value: `${isNaN(stats.safe / stats.total) ? 0 : Math.round((stats.safe / stats.total) * 100)}%`, icon: Shield, color: 'purple', onClick: () => { } },
                     ].map((card, idx) => (
