@@ -18,6 +18,11 @@ export default function SessionHeader({ sessionData, setSessionData, locked, set
 
     const isRestrictedRole = user?.role === 'observer' || user?.role === 'lider'
 
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setSessionData(prev => ({ ...prev, [name]: value }))
+    }
+
     const toggleExpand = () => setIsExpanded(!isExpanded)
 
     return (
