@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import { OBSERVATION_QUESTIONS } from '../constants'
+import { operatorService } from './operators'
 
 export const observationService = {
     /**
@@ -373,6 +374,25 @@ export const observationService = {
             }
         }
 
+        // --- NEW KPI: Operadores No Observados ---
+        let allOperators = []
+        try {
+            allOperators = await operatorService.getAll({
+                site: filters.site,
+                group: filters.group
+            })
+        } catch (error) {
+            console.error('Error fetching all operators for KPI:', error)
+        }
+
+        const observedOperatorNames = new Set(operatorList.map(op => op.operator.trim().toLowerCase()))
+
+        const unobservedOperatorsList = allOperators.filter(
+            op => !observedOperatorNames.has(op.name.trim().toLowerCase())
+        )
+        const totalUnobservedOperators = unobservedOperatorsList.length
+        // -----------------------------------------
+
         return {
             total: observations.length,
             safe: safeCount, // FIXED: Count of SAFE OBSERVATIONS (0 deviations)
@@ -398,7 +418,10 @@ export const observationService = {
             chartData: { labels, safeData, riskData },
             // NEW Charts Data
             observersChart: observersData,
-            itemsChart: itemsChart
+            itemsChart: itemsChart,
+            // NEW KPI Data
+            unobservedOperatorsList,
+            totalUnobservedOperators
         }
     },
 

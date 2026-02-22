@@ -10,8 +10,8 @@ export const operatorService = {
             .eq('is_active', true)
             .order('name')
 
-        if (site) query = query.eq('site', site)
-        if (group) query = query.eq('group', group)
+        if (site && site.length > 0) query = query.in('site', Array.isArray(site) ? site : [site])
+        if (group && group.length > 0) query = query.in('group', Array.isArray(group) ? group : [group])
 
         const { data, error } = await query
         if (error) throw error

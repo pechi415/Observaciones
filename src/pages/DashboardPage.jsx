@@ -644,6 +644,23 @@ export default function DashboardPage() {
                     }
                 ]
                 break;
+            case 'unobserved':
+                title = 'Operadores No Observados'
+                data = stats.unobservedOperatorsList || []
+                columns = [
+                    {
+                        header: 'Sede',
+                        accessor: 'site',
+                        render: (row) => (
+                            <span className="text-xs font-semibold px-2 py-1 bg-gray-50 text-gray-600 rounded border border-gray-100 uppercase tracking-tight">
+                                {row.site}
+                            </span>
+                        )
+                    },
+                    { header: 'Grupo', accessor: 'group' },
+                    { header: 'Operador', accessor: 'name' }
+                ]
+                break;
             default:
                 return;
         }
@@ -659,6 +676,14 @@ export default function DashboardPage() {
             color: 'blue',
             onClick: () => openModal('operators'),
             gradient: 'from-blue-500 to-cyan-400'
+        },
+        {
+            title: 'No Observados',
+            value: stats.totalUnobservedOperators || 0,
+            icon: UserCheck,
+            color: 'orange',
+            onClick: () => openModal('unobserved'),
+            gradient: 'from-orange-500 to-yellow-400'
         },
         {
             title: 'Desviaciones',
