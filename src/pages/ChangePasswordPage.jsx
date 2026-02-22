@@ -54,6 +54,9 @@ export default function ChangePasswordPage() {
 
             if (profileError) console.error('Error clearing password change flag:', profileError)
 
+            // Forzar la actualización inmediata de la sesión para que el token JWT tenga la metadata fresca
+            await supabase.auth.refreshSession()
+
             // Actualizar estado local para que ProtectedRoute libere el paso
             if (refreshProfile) await refreshProfile()
 

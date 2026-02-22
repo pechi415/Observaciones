@@ -44,7 +44,14 @@ export const AuthProvider = ({ children }) => {
                     return
                 }
 
-                setUser(prev => ({ ...prev, ...data }))
+                setUser(prev => {
+                    if (!prev) return data
+                    return {
+                        ...prev,
+                        ...data,
+                        must_change_password: data.must_change_password
+                    }
+                })
             }
         } catch (err) {
             console.warn('Background fetch error:', err)
@@ -66,19 +73,19 @@ export const AuthProvider = ({ children }) => {
                 if (mounted) {
                     if (session?.user) {
                         console.log('Auth: Session found (Fast Path)')
-                        // 1. Set user IMMEDIATELY from session
+                        // 1. Set user map from session first to show UI
                         const fastUser = mapSessionToUser(session.user)
                         setUser(fastUser)
 
-                        // 2. Refresh from DB in background
-                        fetchProfileInBackground(session.user.id)
+                        // 2. WAIT for DB refresh to avoid premature redirects in ProtectedRoute
+                        await fetchProfileInBackground(session.user.id)
                     } else {
                         // Check explicit getUser as backup
                         const { data: userData } = await supabase.auth.getUser()
                         if (userData?.user) {
                             const fastUser = mapSessionToUser(userData.user)
                             setUser(fastUser)
-                            fetchProfileInBackground(userData.user.id)
+                            await fetchProfileInBackground(userData.user.id)
                         } else {
                             setUser(null)
                         }
@@ -103,7 +110,7 @@ export const AuthProvider = ({ children }) => {
                 // Instant update
                 const fastUser = mapSessionToUser(session.user)
                 setUser(fastUser)
-                // Background update
+                // Background update (don't need to await here because it usually happens on active app)
                 fetchProfileInBackground(session.user.id)
             } else {
                 setUser(null)
