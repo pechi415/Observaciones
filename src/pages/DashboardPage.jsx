@@ -1365,15 +1365,18 @@ export default function DashboardPage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center justify-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                        {['admin', 'observer', 'lider'].includes(user?.role) && (
-                                                            <Link
-                                                                to={`/observation/${obs.id}`}
-                                                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm bg-white border border-blue-100"
-                                                                title="Editar"
-                                                            >
-                                                                <FileEdit className="w-4 h-4" />
-                                                            </Link>
-                                                        )}
+                                                        {(
+                                                            user?.role === 'admin' ||
+                                                            (obs.status !== 'completed' && obs.supervisor_id === user?.id)
+                                                        ) && (
+                                                                <Link
+                                                                    to={`/observation/${obs.id}`}
+                                                                    className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm bg-white border border-blue-100"
+                                                                    title="Editar"
+                                                                >
+                                                                    <FileEdit className="w-4 h-4" />
+                                                                </Link>
+                                                            )}
 
                                                         {user?.role === 'admin' && (
                                                             <button
