@@ -305,6 +305,7 @@ export default function DashboardPage() {
                 const { data, error } = await supabase
                     .from('observations')
                     .select('*, profiles(full_name), observation_records(id)')
+                    .order('date', { ascending: false })
                     .order('created_at', { ascending: false })
                     .limit(100)
 
