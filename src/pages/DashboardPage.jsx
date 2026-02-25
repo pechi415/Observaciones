@@ -122,10 +122,12 @@ export default function DashboardPage() {
                         // Mapear respuestas del checklist a columnas tras el Operador
                         const checklist = record.checklist || {}
 
-                        // Estrategia: Iterar sobre el mapa global de preguntas y buscar respuesta
+                        // Estrategia: Iterar sobre el mapa global de preguntas y buscar respuesta por ID o por Texto (migración)
                         allQuestionsMap.forEach((label, id) => {
                             if (checklist.hasOwnProperty(id)) {
                                 row[label] = checklist[id]
+                            } else if (checklist.hasOwnProperty(label)) {
+                                row[label] = checklist[label]
                             } else {
                                 row[label] = ''
                             }
@@ -221,6 +223,8 @@ export default function DashboardPage() {
                         allQuestionsMap.forEach((label, id) => {
                             if (checklist.hasOwnProperty(id)) {
                                 row[label] = checklist[id]
+                            } else if (checklist.hasOwnProperty(label)) {
+                                row[label] = checklist[label]
                             } else {
                                 row[label] = ''
                             }
