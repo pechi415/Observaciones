@@ -79,12 +79,19 @@ async function main() {
 
     let parsedDate = null;
     try {
-      parsedDate = new Date(row['FECHA']);
-      if (isNaN(parsedDate.getTime())) {
-        const parts = row['FECHA'].split('/');
+      const fechaVal = row['FECHA'];
+      if (typeof fechaVal === 'string' && fechaVal.includes('/')) {
+        const parts = fechaVal.split('/');
         let year = parseInt(parts[2]);
         if (year < 100) year += 2000;
+        // Obliga a que parts[0] sea dia y parts[1] sea mes
         parsedDate = new Date(year, parseInt(parts[1]) - 1, parseInt(parts[0]));
+      } else {
+        parsedDate = new Date(fechaVal);
+      }
+
+      if (isNaN(parsedDate.getTime())) {
+        parsedDate = new Date(); // fallback safe
       }
     } catch (e) {
       parsedDate = new Date();
