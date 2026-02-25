@@ -155,6 +155,96 @@ export default function DashboardPage() {
         }
     }
 
+    const handleExportTable = async () => {
+        if (!displayedObservations || displayedObservations.length === 0) {
+            alert('No hay datos visibles en la tabla para exportar.')
+            return
+        }
+
+        try {
+            setExporting(true)
+
+            // Get questions mapping
+            const { data: questionsData } = await supabase
+                .from('questions')
+                .select('*')
+                .order('group_name')
+
+            const allQuestionsMap = new Map()
+            if (questionsData) {
+                questionsData.forEach(q => allQuestionsMap.set(q.id, q.text))
+            }
+
+            // Extract IDs from currently filtered table rows
+            const obsIds = displayedObservations.map(o => o.id)
+
+            // Fetch full records including checklists for these observations
+            const { data: fullRecords, error } = await supabase
+                .from('observations')
+                .select(`
+                    id, date, created_at, shift, site, group_info, observation_type, status,
+                    profiles(full_name),
+                    observation_records(id, operator_name, checklist, comments)
+                `)
+                .in('id', obsIds)
+
+            if (error) throw error
+
+            const flatData = []
+
+            fullRecords.forEach(obs => {
+                const baseInfo = {
+                    'ID Observación': obs.id,
+                    'Fecha': obs.date || String(obs.created_at).split('T')[0],
+                    'Turno': obs.shift,
+                    'Observador': obs.profiles?.full_name,
+                    'Grupo': obs.group_info,
+                    'Sede': obs.site,
+                    'Tipo de Observación': obs.observation_type,
+                    'Estado': obs.status === 'completed' ? 'Completada' : 'En Curso',
+                }
+
+                if (!obs.observation_records || obs.observation_records.length === 0) {
+                    flatData.push({
+                        ...baseInfo,
+                        'Operador': 'SIN REGISTROS',
+                        'Comentarios': '',
+                    })
+                } else {
+                    obs.observation_records.forEach(record => {
+                        const row = {
+                            ...baseInfo,
+                            'Operador': record.operator_name,
+                        }
+
+                        const checklist = record.checklist || {}
+                        allQuestionsMap.forEach((label, id) => {
+                            if (checklist.hasOwnProperty(id)) {
+                                row[label] = checklist[id]
+                            } else {
+                                row[label] = ''
+                            }
+                        })
+
+                        row['Comentarios'] = record.comments
+                        flatData.push(row)
+                    })
+                }
+            })
+
+            const worksheet = XLSX.utils.json_to_sheet(flatData)
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Historial Filtrado")
+            XLSX.writeFile(workbook, `HistorialFiltrado_${new Date().toISOString().split('T')[0]}.xlsx`)
+
+        } catch (error) {
+            console.error('Error exportando tabla parcial:', error)
+            alert('Error al exportar los datos de la tabla')
+        } finally {
+            setExporting(false)
+        }
+    }
+
     const scrollToTable = () => {
         const tableElement = document.querySelector('table');
         if (tableElement) {
@@ -1133,21 +1223,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <button
-                            onClick={() => {
-                                const tableData = filteredObservations.map(obs => ({
-                                    'Fecha': obs.date || new Date(obs.created_at).toLocaleDateString(),
-                                    'Turno': obs.shift,
-                                    'Observador': obs.profiles?.full_name,
-                                    'Grupo': obs.group_info,
-                                    'Sede': obs.site,
-                                    'Tipo': obs.observation_type,
-                                    'Operadores': obs.observation_records?.length
-                                }))
-                                const worksheet = XLSX.utils.json_to_sheet(tableData)
-                                const workbook = XLSX.utils.book_new()
-                                XLSX.utils.book_append_sheet(workbook, worksheet, "Historial")
-                                XLSX.writeFile(workbook, `Historial_${new Date().toISOString().split('T')[0]}.xlsx`)
-                            }}
+                            onClick={handleExportTable}
                             className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition flex items-center shadow-sm"
                         >
                             <Download className="w-4 h-4 mr-2" /> Exportar Tabla
