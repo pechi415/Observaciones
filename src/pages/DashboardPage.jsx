@@ -85,11 +85,8 @@ export default function DashboardPage() {
                 return
             }
 
-            // 1. Obtener todas las preguntas únicas para las cabeceras
-            const allQuestionsMap = new Map() // ID -> Label
-            Object.values(OBSERVATION_QUESTIONS).flat().forEach(q => {
-                allQuestionsMap.set(q.id, q.label)
-            })
+            // 1. Obtener todas las cabeceras/preguntas únicas (texto)
+            const allHeaders = Array.from(new Set(Object.values(OBSERVATION_QUESTIONS).flat().map(q => q.label)))
 
             // Aplanar datos: Cada fila es un registro de observación (un operador)
             const flatData = []
@@ -121,21 +118,30 @@ export default function DashboardPage() {
 
                         // Mapear respuestas del checklist a columnas tras el Operador
                         const checklist = record.checklist || {}
+                        const typeQuestions = OBSERVATION_QUESTIONS[obs.observation_type] || []
 
-                        // Estrategia: Iterar sobre el mapa global de preguntas y buscar respuesta por ID o por Texto (fuzzy match)
-                        allQuestionsMap.forEach((label, id) => {
+                        // Iterar sobre cada cabecera única y buscar si el operador tiene una respuesta
+                        allHeaders.forEach(label => {
                             let found = undefined;
-                            if (checklist[id] !== undefined) {
-                                found = checklist[id];
-                            } else if (checklist[label] !== undefined) {
+
+                            // 1. Coincidencia directa por texto (Data antigua de migración)
+                            if (checklist[label] !== undefined) {
                                 found = checklist[label];
                             } else {
-                                // Fuzzy match ignoring ¿, ?, casing, accents and whitespace
+                                // 2. Búsqueda difusa (Data antigua ignorando tildes y signos)
                                 const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f¿?]/g, "").toLowerCase().trim();
                                 const cleanLabel = normalize(label);
                                 const matchKey = Object.keys(checklist).find(k => normalize(k) === cleanLabel);
+
                                 if (matchKey) {
                                     found = checklist[matchKey];
+                                } else {
+                                    // 3. Coincidencia por ID interno (Data nueva generada en la APP)
+                                    // Solo mapeamos el ID si la pregunta es válida para ESTE tipo de observación
+                                    const validQuestion = typeQuestions.find(q => q.label === label);
+                                    if (validQuestion && checklist[validQuestion.id] !== undefined) {
+                                        found = checklist[validQuestion.id];
+                                    }
                                 }
                             }
                             row[label] = found !== undefined ? found : '';
@@ -174,10 +180,7 @@ export default function DashboardPage() {
         try {
             setExporting(true)
 
-            const allQuestionsMap = new Map()
-            Object.values(OBSERVATION_QUESTIONS).flat().forEach(q => {
-                allQuestionsMap.set(q.id, q.label)
-            })
+            const allHeaders = Array.from(new Set(Object.values(OBSERVATION_QUESTIONS).flat().map(q => q.label)))
 
             // Extract IDs from currently filtered table rows
             const obsIds = displayedObservations.map(o => o.id)
@@ -222,18 +225,28 @@ export default function DashboardPage() {
                         }
 
                         const checklist = record.checklist || {}
-                        allQuestionsMap.forEach((label, id) => {
+                        const typeQuestions = OBSERVATION_QUESTIONS[obs.observation_type] || []
+
+                        allHeaders.forEach(label => {
                             let found = undefined;
-                            if (checklist[id] !== undefined) {
-                                found = checklist[id];
-                            } else if (checklist[label] !== undefined) {
+
+                            // 1. Direct label match
+                            if (checklist[label] !== undefined) {
                                 found = checklist[label];
                             } else {
+                                // 2. Fuzzy match
                                 const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f¿?]/g, "").toLowerCase().trim();
                                 const cleanLabel = normalize(label);
                                 const matchKey = Object.keys(checklist).find(k => normalize(k) === cleanLabel);
+
                                 if (matchKey) {
                                     found = checklist[matchKey];
+                                } else {
+                                    // 3. ID match restricted to relevant valid questions for this observation type
+                                    const validQuestion = typeQuestions.find(q => q.label === label);
+                                    if (validQuestion && checklist[validQuestion.id] !== undefined) {
+                                        found = checklist[validQuestion.id];
+                                    }
                                 }
                             }
                             row[label] = found !== undefined ? found : '';
