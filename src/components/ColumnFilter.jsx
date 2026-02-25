@@ -41,10 +41,27 @@ export const ColumnFilter = ({ column, data, filters, onChange }) => {
     const selectedValues = filters[column.accessor]
 
     const toggleSelectAll = () => {
-        if (selectedValues && selectedValues.length === uniqueValues.length) {
-            onChange(column.accessor, []) // Deselect all
+        const isSearchActive = searchTerm.trim() !== ''
+
+        if (isSearchActive) {
+            const allDisplayedSelected = displayedValues.every(v => !selectedValues || selectedValues.includes(v))
+            if (allDisplayedSelected) {
+                const current = selectedValues || [...uniqueValues]
+                const newSelected = current.filter(v => !displayedValues.includes(v))
+                if (newSelected.length === 0) onChange(column.accessor, [])
+                else onChange(column.accessor, newSelected)
+            } else {
+                const current = selectedValues || []
+                const newSet = new Set([...current, ...displayedValues])
+                if (newSet.size === uniqueValues.length) onChange(column.accessor, undefined)
+                else onChange(column.accessor, Array.from(newSet))
+            }
         } else {
-            onChange(column.accessor, undefined) // Select all (reset filter)
+            if (!selectedValues || selectedValues.length > 0) {
+                onChange(column.accessor, []) // Deselect all
+            } else {
+                onChange(column.accessor, undefined) // Select all
+            }
         }
     }
 
@@ -154,11 +171,17 @@ export const ColumnFilter = ({ column, data, filters, onChange }) => {
                                 <label className="flex items-center px-2 py-1.5 hover:bg-gray-50 rounded cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={!selectedValues || selectedValues.length === uniqueValues.length}
+                                        checked={
+                                            searchTerm.trim() !== ''
+                                                ? (displayedValues.length > 0 && displayedValues.every(val => !selectedValues || selectedValues.includes(val)))
+                                                : (!selectedValues || selectedValues.length === uniqueValues.length)
+                                        }
                                         onChange={toggleSelectAll}
                                         className="rounded text-blue-600 focus:ring-blue-500 h-4 w-4 border-gray-300"
                                     />
-                                    <span className="ml-2 text-sm text-gray-700 font-medium">(Seleccionar todo)</span>
+                                    <span className="ml-2 text-sm text-gray-700 font-medium">
+                                        {searchTerm.trim() !== '' ? '(Seleccionar resultados)' : '(Seleccionar todo)'}
+                                    </span>
                                 </label>
 
                                 <div className="my-1 border-t border-gray-100"></div>
