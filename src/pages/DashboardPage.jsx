@@ -130,11 +130,10 @@ export default function DashboardPage() {
                             } else if (checklist[label] !== undefined) {
                                 found = checklist[label];
                             } else {
-                                // Fuzzy match ignoring ¿, ?, casing, and whitespace
-                                const cleanLabel = label.replace(/[¿?]/g, '').toLowerCase().trim();
-                                const matchKey = Object.keys(checklist).find(k =>
-                                    k.replace(/[¿?]/g, '').toLowerCase().trim() === cleanLabel
-                                );
+                                // Fuzzy match ignoring ¿, ?, casing, accents and whitespace
+                                const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f¿?]/g, "").toLowerCase().trim();
+                                const cleanLabel = normalize(label);
+                                const matchKey = Object.keys(checklist).find(k => normalize(k) === cleanLabel);
                                 if (matchKey) {
                                     found = checklist[matchKey];
                                 }
@@ -175,16 +174,10 @@ export default function DashboardPage() {
         try {
             setExporting(true)
 
-            // Get questions mapping
-            const { data: questionsData } = await supabase
-                .from('questions')
-                .select('*')
-                .order('group_name')
-
             const allQuestionsMap = new Map()
-            if (questionsData) {
-                questionsData.forEach(q => allQuestionsMap.set(q.id, q.text))
-            }
+            Object.values(OBSERVATION_QUESTIONS).flat().forEach(q => {
+                allQuestionsMap.set(q.id, q.label)
+            })
 
             // Extract IDs from currently filtered table rows
             const obsIds = displayedObservations.map(o => o.id)
@@ -236,10 +229,9 @@ export default function DashboardPage() {
                             } else if (checklist[label] !== undefined) {
                                 found = checklist[label];
                             } else {
-                                const cleanLabel = label.replace(/[¿?]/g, '').toLowerCase().trim();
-                                const matchKey = Object.keys(checklist).find(k =>
-                                    k.replace(/[¿?]/g, '').toLowerCase().trim() === cleanLabel
-                                );
+                                const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f¿?]/g, "").toLowerCase().trim();
+                                const cleanLabel = normalize(label);
+                                const matchKey = Object.keys(checklist).find(k => normalize(k) === cleanLabel);
                                 if (matchKey) {
                                     found = checklist[matchKey];
                                 }

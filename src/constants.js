@@ -14,7 +14,7 @@ export const OBSERVATION_QUESTIONS = {
         { id: 'distractions', label: '¿Opera sin distracciones?' },
         { id: 'seatbelt', label: '¿Usa el cinturón de seguridad?' },
         { id: 'respiratory', label: '¿Usa protección respiratoria?' },
-        { id: 'distance', label: '¿Mantiene distancia segura de seguimiento?' },
+        { id: 'distance', label: '¿Mantiene la distancia segura de seguimiento?' },
         { id: 'signals', label: '¿Usa los direccionales apropiadamente?' },
         { id: 'traffic_signs', label: '¿Respeta las señales de tránsito?' },
         { id: 'lane', label: '¿Conduce por el carril correspondiente?' }
