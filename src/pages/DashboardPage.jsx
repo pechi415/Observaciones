@@ -365,6 +365,17 @@ export default function DashboardPage() {
         })
     }, [recentObservations, tableColumnFilters])
 
+    // Limit displayed observations to 100 if no filters are applied
+    const displayedObservations = useMemo(() => {
+        const hasFilters = Object.values(tableColumnFilters).some(v => {
+            if (!v) return false
+            if (Array.isArray(v)) return v.length > 0
+            if (typeof v === 'object') return !!(v.start || v.end)
+            return true
+        })
+        return hasFilters ? filteredObservations : filteredObservations.slice(0, 100)
+    }, [filteredObservations, tableColumnFilters])
+
 
     // Load stats only once or when user changes
     useEffect(() => {
@@ -1116,7 +1127,9 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold text-gray-800">Historial de Observaciones</h3>
-                                <p className="text-sm text-gray-500">{filteredObservations.length} de {recentObservations.length} registros cargados</p>
+                                <p className="text-sm text-gray-500">
+                                    Mostrando {displayedObservations.length} de {filteredObservations.length} registros encontrados
+                                </p>
                             </div>
                         </div>
                         <button
@@ -1185,7 +1198,7 @@ export default function DashboardPage() {
                                                 </div>
                                             </td>
                                         </tr>
-                                    ) : filteredObservations.length === 0 ? (
+                                    ) : displayedObservations.length === 0 ? (
                                         <tr>
                                             <td colSpan="9" className="px-6 py-12 text-center text-gray-500 bg-gray-50/30">
                                                 <div className="flex flex-col items-center gap-3">
@@ -1201,7 +1214,7 @@ export default function DashboardPage() {
                                             </td>
                                         </tr>
                                     ) : (
-                                        filteredObservations.map((obs) => (
+                                        displayedObservations.map((obs) => (
                                             <tr key={obs.id} className="hover:bg-blue-50/40 transition-colors group border-b border-gray-50">
                                                 <td className="px-6 py-4 font-bold text-gray-800 whitespace-nowrap">
                                                     {(() => {
