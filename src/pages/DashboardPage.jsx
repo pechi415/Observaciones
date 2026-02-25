@@ -122,15 +122,24 @@ export default function DashboardPage() {
                         // Mapear respuestas del checklist a columnas tras el Operador
                         const checklist = record.checklist || {}
 
-                        // Estrategia: Iterar sobre el mapa global de preguntas y buscar respuesta por ID o por Texto (migración)
+                        // Estrategia: Iterar sobre el mapa global de preguntas y buscar respuesta por ID o por Texto (fuzzy match)
                         allQuestionsMap.forEach((label, id) => {
-                            if (checklist.hasOwnProperty(id)) {
-                                row[label] = checklist[id]
-                            } else if (checklist.hasOwnProperty(label)) {
-                                row[label] = checklist[label]
+                            let found = undefined;
+                            if (checklist[id] !== undefined) {
+                                found = checklist[id];
+                            } else if (checklist[label] !== undefined) {
+                                found = checklist[label];
                             } else {
-                                row[label] = ''
+                                // Fuzzy match ignoring ¿, ?, casing, and whitespace
+                                const cleanLabel = label.replace(/[¿?]/g, '').toLowerCase().trim();
+                                const matchKey = Object.keys(checklist).find(k =>
+                                    k.replace(/[¿?]/g, '').toLowerCase().trim() === cleanLabel
+                                );
+                                if (matchKey) {
+                                    found = checklist[matchKey];
+                                }
                             }
+                            row[label] = found !== undefined ? found : '';
                         })
 
                         // Añadir Comentarios al final de todo
@@ -221,13 +230,21 @@ export default function DashboardPage() {
 
                         const checklist = record.checklist || {}
                         allQuestionsMap.forEach((label, id) => {
-                            if (checklist.hasOwnProperty(id)) {
-                                row[label] = checklist[id]
-                            } else if (checklist.hasOwnProperty(label)) {
-                                row[label] = checklist[label]
+                            let found = undefined;
+                            if (checklist[id] !== undefined) {
+                                found = checklist[id];
+                            } else if (checklist[label] !== undefined) {
+                                found = checklist[label];
                             } else {
-                                row[label] = ''
+                                const cleanLabel = label.replace(/[¿?]/g, '').toLowerCase().trim();
+                                const matchKey = Object.keys(checklist).find(k =>
+                                    k.replace(/[¿?]/g, '').toLowerCase().trim() === cleanLabel
+                                );
+                                if (matchKey) {
+                                    found = checklist[matchKey];
+                                }
                             }
+                            row[label] = found !== undefined ? found : '';
                         })
 
                         row['Comentarios'] = record.comments
