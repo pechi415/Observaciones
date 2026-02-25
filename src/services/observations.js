@@ -158,7 +158,7 @@ export const observationService = {
                 supervisor_id,
                 status,
                 profiles(full_name),
-                observation_records(id, operator_name, checklist)
+                observation_records(id, operator_name, checklist, comments)
             `)
             .order('created_at', { ascending: false })
             .limit(1000)
