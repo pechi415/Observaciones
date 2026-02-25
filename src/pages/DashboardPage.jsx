@@ -16,7 +16,7 @@ import {
     Filler // NEW
 } from 'chart.js'
 import * as XLSX from 'xlsx'
-import { Shield, AlertTriangle, CheckCircle, TrendingUp, Users, PlusCircle, FileEdit, Trash2, Filter, Search, X, Calendar, Download, List, BarChart2, Briefcase, UserCheck, AlertOctagon, Sun } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle, TrendingUp, Users, PlusCircle, FileEdit, Trash2, Filter, Search, X, Calendar, Download, List, BarChart2, Briefcase, UserCheck, AlertOctagon, Sun, ArrowUp } from 'lucide-react'
 import { OBSERVATION_QUESTIONS, SITES, GROUPS } from '../constants'
 
 ChartJS.register(
@@ -74,6 +74,24 @@ export default function DashboardPage() {
     // Table Column Filters State
     const [tableColumnFilters, setTableColumnFilters] = useState({})
 
+    // Scroll to Top State
+    const [showScroll, setShowScroll] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                setShowScroll(true)
+            } else {
+                setShowScroll(false)
+            }
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
     // Export Function
     const handleExport = async () => {
         try {
@@ -1399,6 +1417,17 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Scroll to Top Floating Button */}
+            {showScroll && (
+                <button
+                    onClick={scrollToTop}
+                    title="Volver Arriba"
+                    className="fixed bottom-8 right-8 p-3 bg-blue-600 outline-none text-white rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 hover:-translate-y-1 active:scale-95 transition-all z-50 flex items-center justify-center animate-fade-in"
+                >
+                    <ArrowUp className="w-6 h-6" />
+                </button>
+            )}
 
         </Layout >
     )
