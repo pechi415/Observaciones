@@ -1423,7 +1423,7 @@ export default function DashboardPage() {
                 <button
                     onClick={scrollToTop}
                     title="Volver Arriba"
-                    className="fixed bottom-8 right-8 p-3 bg-blue-600 outline-none text-white rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 hover:-translate-y-1 active:scale-95 transition-all z-50 flex items-center justify-center animate-fade-in"
+                    className="fixed bottom-8 right-8 p-3 bg-white/40 backdrop-blur-md border border-white/50 text-blue-800 rounded-full shadow-lg hover:bg-white/70 hover:scale-110 hover:-translate-y-1 active:scale-95 transition-all z-50 flex items-center justify-center animate-fade-in"
                 >
                     <ArrowUp className="w-6 h-6" />
                 </button>
