@@ -144,7 +144,14 @@ export default function DashboardPage() {
                                     }
                                 }
                             }
-                            row[label] = found !== undefined ? found : '';
+                            let finalValue = found !== undefined ? found : '';
+                            if (typeof finalValue === 'string') {
+                                const up = finalValue.toUpperCase().trim();
+                                if (up === 'SI' || up === 'SÍ') finalValue = 'Si';
+                                else if (up === 'NO') finalValue = 'No';
+                                else if (up === 'N/A' || up === 'NA') finalValue = '';
+                            }
+                            row[label] = finalValue;
                         })
 
                         // Añadir Comentarios al final de todo
@@ -249,7 +256,14 @@ export default function DashboardPage() {
                                     }
                                 }
                             }
-                            row[label] = found !== undefined ? found : '';
+                            let finalValue = found !== undefined ? found : '';
+                            if (typeof finalValue === 'string') {
+                                const up = finalValue.toUpperCase().trim();
+                                if (up === 'SI' || up === 'SÍ') finalValue = 'Si';
+                                else if (up === 'NO') finalValue = 'No';
+                                else if (up === 'N/A' || up === 'NA') finalValue = '';
+                            }
+                            row[label] = finalValue;
                         })
 
                         row['Comentarios'] = record.comments
