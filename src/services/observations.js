@@ -188,6 +188,9 @@ export const observationService = {
         let safeCount = 0
         let riskCount = 0
 
+        // True count of all 'No' answers across all checklists
+        let totalDeviationsCount = 0
+
         // Chart 3: Findings (Positive vs Negative)
         let positiveFindings = 0
         let negativeFindings = 0
@@ -262,6 +265,7 @@ export const observationService = {
                         const v = String(val).toLowerCase()
                         if (v === 'no') {
                             operatorHasDeviations = true;
+                            totalDeviationsCount++; // Count actual questions failed
                             // Observer Deviations
                             if (observerStats[observerName]) observerStats[observerName].deviations++
 
@@ -407,7 +411,7 @@ export const observationService = {
             safe: safeCount, // FIXED: Count of SAFE OBSERVATIONS (0 deviations)
             risk: riskCount, // FIXED: Count of RISK OBSERVATIONS (>0 deviations)
             totalOperators: totalOperatorsCount,
-            totalDeviations: negativeFindings, // Keep total deviations count for reference
+            totalDeviations: totalDeviationsCount, // FIXED: Now counts total questions failed (66) instead of operators failed (65)
             observationsList: observations,
             observationsList: observations,
             deviationList,
