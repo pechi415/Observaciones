@@ -161,7 +161,6 @@ export const observationService = {
                 observation_records(id, operator_name, checklist, comments)
             `)
             .order('created_at', { ascending: false })
-            .limit(1000)
 
         // Apply DB Filters
         if (filters.startDate) query = query.gte('date', filters.startDate)
@@ -255,11 +254,14 @@ export const observationService = {
 
                     // Check deviations & Findings
                     const checklist = record.checklist || {}
+
+                    // Track if this specific operator had any deviations
+                    let operatorHasDeviations = false;
+
                     Object.entries(checklist).forEach(([key, val]) => {
                         const v = String(val).toLowerCase()
-                        if (v === 'si') positiveFindings++
                         if (v === 'no') {
-                            negativeFindings++
+                            operatorHasDeviations = true;
                             // Observer Deviations
                             if (observerStats[observerName]) observerStats[observerName].deviations++
 
@@ -274,6 +276,13 @@ export const observationService = {
                             else if (groupName.includes('3')) itemsGroupStats[questionText]['Grupo 3']++
                         }
                     })
+
+                    // A form is a Positive Finding if it has 0 deviations
+                    if (operatorHasDeviations) {
+                        negativeFindings++;
+                    } else {
+                        positiveFindings++;
+                    }
 
                     const deviations = Object.entries(checklist).filter(([key, val]) => {
                         const v = String(val).toLowerCase()

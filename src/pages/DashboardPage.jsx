@@ -455,7 +455,6 @@ export default function DashboardPage() {
                     .select('*, profiles(full_name), observation_records(id)')
                     .order('date', { ascending: false })
                     .order('created_at', { ascending: false })
-                    .limit(1000)
 
                 if (error) throw error
                 setRecentObservations(data || [])
