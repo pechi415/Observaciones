@@ -155,11 +155,19 @@ export default function ObservationPage() {
             try {
                 setLoading(true)
                 setError(null)
-                // Crear la cabecera en Supabase
-                const observation = await observationService.createHeader(sessionData)
-                setSessionId(observation.id)
+
+                if (sessionId) {
+                    // Actualizar cabecera existente (no duplicar)
+                    await observationService.updateHeader(sessionId, sessionData)
+                    console.log('Cabecera actualizada:', sessionId)
+                } else {
+                    // Crear nueva cabecera
+                    const observation = await observationService.createHeader(sessionData)
+                    setSessionId(observation.id)
+                    console.log('Sesión iniciada:', observation.id)
+                }
+
                 setLocked(true)
-                console.log('Sesión iniciada:', observation.id)
             } catch (err) {
                 console.error(err)
                 setError('Error al iniciar la sesión en la base de datos: ' + err.message)

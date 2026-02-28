@@ -31,6 +31,27 @@ export const observationService = {
     },
 
     /**
+     * Actualiza la cabecera de una observación existente.
+     */
+    async updateHeader(id, data) {
+        const { data: observation, error } = await supabase
+            .from('observations')
+            .update({
+                date: data.date,
+                shift: data.shift,
+                site: data.site,
+                group_info: data.group,
+                observation_type: data.observationType
+            })
+            .eq('id', id)
+            .select()
+            .single()
+
+        if (error) throw error
+        return observation
+    },
+
+    /**
      * Busca si el usuario ya tiene una observación en curso.
      */
     async getActiveObservation(userId) {
