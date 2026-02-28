@@ -97,26 +97,31 @@ export default function AdminUserFormPage() {
 
                 // If password provided in Edit Mode, update it
                 if (formData.password && formData.password.length >= 6) {
-                    // WARNING: Client-side password update for OTHER users is restricted in Supabase.
-                    // This creates a dedicated AdminUserUpdate function call if backend existed.
-                    // WORKAROUND: For this prototype, we use the Admin API via a Service Role Key (NOT RECOMMENDED for production)
-                    // OR we accept that we cannot change it without proper backend.
+                    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+                    const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
 
-                    // Attempting update via client (will likely fail for others)
-                    // const { error: passError } = await supabase.auth.updateUser({ password: formData.password })
+                    if (supabaseServiceKey) {
+                        const { createClient } = await import('@supabase/supabase-js')
+                        const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-                    // User feedback for limitation
-                    setMsg('Datos actualizados. ℹ️ La contraseña no se cambió (requiere backend). Pide al usuario que use "Olvide mi contraseña".')
+                        // Use the admin auth API to forcefully reset another user's password
+                        const { error: passError } = await supabaseAdmin.auth.admin.updateUserById(
+                            id,
+                            { password: formData.password }
+                        )
 
-                    // NOTE: To make this work effectively in a pure client demo without Edge Functions,
-                    // we often have to Re-create the user or use a trick. 
-                    // Since the user asked for "Reset", and we are likely in a mocked/relaxed env or the user accepts limitations:
-                    // We will show a message.
+                        if (passError) throw passError
 
-                    // However, if we really want to force it and have the credentials, we could try re-signup? No.
+                        // Optionally force them to change it again when they log in
+                        await supabase
+                            .from('profiles')
+                            .update({ must_change_password: true })
+                            .eq('id', id)
 
-                    // Let's try the standard update update, maybe RLS allows it?
-                    // Usually no.
+                        setMsg('Usuario y contraseña actualizados correctamente. El usuario deberá cambiarla al ingresar.')
+                    } else {
+                        setMsg('Datos actualizados. ℹ️ La contraseña no se cambió (falta clave administrativa).')
+                    }
                 } else {
                     setMsg('Usuario actualizado correctamente')
                 }
