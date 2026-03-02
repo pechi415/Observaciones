@@ -514,14 +514,22 @@ export default function DashboardPage() {
 
     // Limit displayed observations to 100 if no filters are applied
     const displayedObservations = useMemo(() => {
+        let baseList = filteredObservations;
+
+        // Visual Filter for Observer Role: Only see their own records.
+        if (user?.user_metadata?.role === 'Observador') {
+            baseList = baseList.filter(item => item.supervisor_id === user.id);
+        }
+
         const hasFilters = Object.values(tableColumnFilters).some(v => {
             if (!v) return false
             if (Array.isArray(v)) return v.length > 0
             if (typeof v === 'object') return !!(v.start || v.end)
             return true
         })
-        return hasFilters ? filteredObservations : filteredObservations.slice(0, 100)
-    }, [filteredObservations, tableColumnFilters])
+
+        return hasFilters ? baseList : baseList.slice(0, 100)
+    }, [filteredObservations, tableColumnFilters, user])
 
 
     // Load stats only once or when user changes
