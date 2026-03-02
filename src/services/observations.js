@@ -374,10 +374,50 @@ export const observationService = {
 
         // Process Observer Data for Charts
         const observersLabels = Object.keys(observerStats)
+
+        // Helper to pair and sort
+        const observerDataArray = observersLabels.map(l => ({
+            label: l,
+            observations: observerStats[l].count,
+            uniqueOperators: observerStats[l].operators.size,
+            deviations: observerStats[l].deviations,
+            morning: observerStats[l].shifts['Diurno'] || 0,
+            night: observerStats[l].shifts['Nocturno'] || 0
+        }));
+
+        // Default sort by observations descending, just to have a base
+        // But the frontend wants individual sorting per chart.
+        // We will pass the arrays as they are but we will create individually sorted objects for each metric.
+
+        const getSortedArrays = (key) => {
+            const sorted = [...observerDataArray].sort((a, b) => b[key] - a[key]);
+            return {
+                labels: sorted.map(item => item.label),
+                data: sorted.map(item => item[key])
+            }
+        };
+
+        const getSortedShifts = () => {
+            const sorted = [...observerDataArray].sort((a, b) => (b.morning + b.night) - (a.morning + a.night));
+            return {
+                labels: sorted.map(item => item.label),
+                morning: sorted.map(item => item.morning),
+                night: sorted.map(item => item.night)
+            }
+        }
+
+        const sortedObservations = getSortedArrays('observations');
+        const sortedOperators = getSortedArrays('uniqueOperators');
+        const sortedDeviations = getSortedArrays('deviations');
+        const sortedShiftsObj = getSortedShifts();
+
         const observersData = {
-            labels: observersLabels,
-            observations: observersLabels.map(l => observerStats[l].count),
-            uniqueOperators: observersLabels.map(l => observerStats[l].operators.size),
+            // Provide pre-sorted arrays for each specific chart
+            sortedObservations,
+            sortedOperators,
+            sortedDeviations,
+            sortedShifts: sortedShiftsObj,
+            // Keep original for back-compat if needed elsewhere
             labels: observersLabels,
             observations: observersLabels.map(l => observerStats[l].count),
             uniqueOperators: observersLabels.map(l => observerStats[l].operators.size),

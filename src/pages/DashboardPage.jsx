@@ -618,47 +618,67 @@ export default function DashboardPage() {
     }
 
     // New Charts Data (Phase 4.12)
-    const observersRaw = stats.observersChart || { labels: [], observations: [], uniqueOperators: [], deviations: [], shifts: { morning: [], afternoon: [], night: [] } }
+    const observersRaw = stats.observersChart || {
+        labels: [], observations: [], uniqueOperators: [], deviations: [], shifts: { morning: [], afternoon: [], night: [] }
+    }
 
+    const sortChart = (labels, values) => {
+        if (!labels || labels.length === 0) return { labels: [], data: [] };
+        const combined = labels.map((l, i) => ({ l, v: values[i] || 0 })).sort((a, b) => b.v - a.v);
+        return { labels: combined.map(c => c.l), data: combined.map(c => c.v) };
+    }
+
+    const sortShifts = (labels, morning, night) => {
+        if (!labels || labels.length === 0) return { labels: [], morning: [], night: [] };
+        const combined = labels.map((l, i) => ({
+            l, m: morning[i] || 0, n: night[i] || 0, t: (morning[i] || 0) + (night[i] || 0)
+        })).sort((a, b) => b.t - a.t);
+        return { labels: combined.map(c => c.l), morning: combined.map(c => c.m), night: combined.map(c => c.n) };
+    }
+
+    const sortedObs = sortChart(observersRaw.labels, observersRaw.observations);
     // Chart 4: Obs vs Observers
     const obsVsObserversData = {
-        labels: observersRaw.labels,
+        labels: sortedObs.labels,
         datasets: [{
             label: 'Observaciones',
-            data: observersRaw.observations,
+            data: sortedObs.data,
             backgroundColor: '#A78BFA', // Violet-400
             borderRadius: 4
         }]
     }
 
+    const sortedOps = sortChart(observersRaw.labels, observersRaw.uniqueOperators);
     // Chart 5: Operators vs Observers
     const opsVsObserversData = {
-        labels: observersRaw.labels,
+        labels: sortedOps.labels,
         datasets: [{
             label: 'Operadores',
-            data: observersRaw.uniqueOperators,
+            data: sortedOps.data,
             backgroundColor: '#22D3EE', // Cyan-400
             borderRadius: 4
         }]
     }
 
+    const sortedDevs = sortChart(observersRaw.labels, observersRaw.deviations);
     // Chart 6: Deviations vs Observers
     const devVsObserversData = {
-        labels: observersRaw.labels,
+        labels: sortedDevs.labels,
         datasets: [{
             label: 'Desviaciones',
-            data: observersRaw.deviations,
+            data: sortedDevs.data,
             backgroundColor: '#818CF8', // Indigo-400
             borderRadius: 4
         }]
     }
 
+    const sortedShiftsCombined = sortShifts(observersRaw.labels, observersRaw.shifts?.morning || [], observersRaw.shifts?.night || []);
     // Chart 7: Shifts vs Observers
     const shiftsVsObserversData = {
-        labels: observersRaw.labels,
+        labels: sortedShiftsCombined.labels,
         datasets: [
-            { label: 'Diurno', data: observersRaw.shifts.morning, backgroundColor: '#EAB308', borderRadius: 4 }, // Yellow-500
-            { label: 'Nocturno', data: observersRaw.shifts.night, backgroundColor: '#1E3A8A', borderRadius: 4 } // Blue-900
+            { label: 'Diurno', data: sortedShiftsCombined.morning, backgroundColor: '#EAB308', borderRadius: 4 }, // Yellow-500
+            { label: 'Nocturno', data: sortedShiftsCombined.night, backgroundColor: '#1E3A8A', borderRadius: 4 } // Blue-900
         ]
     }
 
@@ -1161,7 +1181,7 @@ export default function DashboardPage() {
                             Observaciones vs Observadores
                         </h3>
                         <div className="h-80 flex items-center justify-center">
-                            <Bar data={obsVsObserversData} plugins={[dataLabelsPlugin]} options={{
+                            <Bar key={JSON.stringify(obsVsObserversData.labels)} data={obsVsObserversData} plugins={[dataLabelsPlugin]} options={{
                                 maintainAspectRatio: false,
                                 layout: { padding: { top: 20 } },
                                 scales: {
@@ -1180,7 +1200,7 @@ export default function DashboardPage() {
                             Operadores vs Observadores
                         </h3>
                         <div className="h-80 flex items-center justify-center">
-                            <Bar data={opsVsObserversData} plugins={[dataLabelsPlugin]} options={{
+                            <Bar key={JSON.stringify(opsVsObserversData.labels)} data={opsVsObserversData} plugins={[dataLabelsPlugin]} options={{
                                 maintainAspectRatio: false,
                                 layout: { padding: { top: 20 } },
                                 scales: {
@@ -1199,7 +1219,7 @@ export default function DashboardPage() {
                             Desviaciones vs Observadores
                         </h3>
                         <div className="h-80 flex items-center justify-center">
-                            <Bar data={devVsObserversData} plugins={[dataLabelsPlugin]} options={{
+                            <Bar key={JSON.stringify(devVsObserversData.labels)} data={devVsObserversData} plugins={[dataLabelsPlugin]} options={{
                                 maintainAspectRatio: false,
                                 layout: { padding: { top: 20 } },
                                 scales: {
@@ -1218,7 +1238,7 @@ export default function DashboardPage() {
                             Observaciones por Turno
                         </h3>
                         <div className="h-80 flex items-center justify-center">
-                            <Bar data={shiftsVsObserversData} plugins={[dataLabelsPlugin]} options={{
+                            <Bar key={JSON.stringify(shiftsVsObserversData.labels)} data={shiftsVsObserversData} plugins={[dataLabelsPlugin]} options={{
                                 maintainAspectRatio: false,
                                 layout: { padding: { top: 20 } },
                                 scales: {
@@ -1381,7 +1401,7 @@ export default function DashboardPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className="flex items-center justify-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center justify-center gap-2 opacity-100 xl:opacity-0 xl:group-hover:opacity-100 transition-opacity">
                                                         {(
                                                             user?.role === 'admin' ||
                                                             (obs.status !== 'completed' && obs.supervisor_id === user?.id)
