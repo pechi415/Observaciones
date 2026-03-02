@@ -631,6 +631,7 @@ export default function DashboardPage() {
             const shortName = `${firstName} ${lastName}`;
             // Specific request from user
             if (shortName === 'Martínez López' || fullName.includes('Martínez López Jesús')) return 'Jesús López';
+            if (shortName === 'Baena Díaz' || fullName.includes('Baena Díaz')) return 'Joaquín Diaz';
             return shortName;
         }
         return fullName;
