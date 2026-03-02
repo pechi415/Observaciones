@@ -622,16 +622,27 @@ export default function DashboardPage() {
         labels: [], observations: [], uniqueOperators: [], deviations: [], shifts: { morning: [], afternoon: [], night: [] }
     }
 
+    const formatShortName = (fullName) => {
+        if (!fullName) return '';
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length >= 3) {
+            const lastName = parts[0];
+            const firstName = parts.length === 3 ? parts[1] : parts[2];
+            return `${firstName} ${lastName}`;
+        }
+        return fullName;
+    }
+
     const sortChart = (labels, values) => {
         if (!labels || labels.length === 0) return { labels: [], data: [] };
-        const combined = labels.map((l, i) => ({ l, v: values[i] || 0 })).sort((a, b) => b.v - a.v);
+        const combined = labels.map((l, i) => ({ l: formatShortName(l), v: values[i] || 0 })).sort((a, b) => b.v - a.v);
         return { labels: combined.map(c => c.l), data: combined.map(c => c.v) };
     }
 
     const sortShifts = (labels, morning, night) => {
         if (!labels || labels.length === 0) return { labels: [], morning: [], night: [] };
         const combined = labels.map((l, i) => ({
-            l, m: morning[i] || 0, n: night[i] || 0, t: (morning[i] || 0) + (night[i] || 0)
+            l: formatShortName(l), m: morning[i] || 0, n: night[i] || 0, t: (morning[i] || 0) + (night[i] || 0)
         })).sort((a, b) => b.t - a.t);
         return { labels: combined.map(c => c.l), morning: combined.map(c => c.m), night: combined.map(c => c.n) };
     }
