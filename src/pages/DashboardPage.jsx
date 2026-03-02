@@ -628,7 +628,10 @@ export default function DashboardPage() {
         if (parts.length >= 3) {
             const lastName = parts[0];
             const firstName = parts.length === 3 ? parts[1] : parts[2];
-            return `${firstName} ${lastName}`;
+            const shortName = `${firstName} ${lastName}`;
+            // Specific request from user
+            if (shortName === 'Martínez López' || fullName.includes('Martínez López Jesús')) return 'Jesús López';
+            return shortName;
         }
         return fullName;
     }
