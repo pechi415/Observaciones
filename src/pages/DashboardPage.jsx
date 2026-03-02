@@ -517,7 +517,7 @@ export default function DashboardPage() {
         let baseList = filteredObservations;
 
         // Visual Filter for Observer Role: Only see their own records.
-        if (user?.user_metadata?.role === 'Observador') {
+        if (user?.user_metadata?.role === 'observer') {
             baseList = baseList.filter(item => item.supervisor_id === user.id);
         }
 
