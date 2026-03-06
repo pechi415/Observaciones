@@ -118,12 +118,15 @@ export default function AdminUserFormPage() {
                             .update({ must_change_password: true })
                             .eq('id', id)
 
-                        setMsg('Usuario y contraseña actualizados correctamente. El usuario deberá cambiarla al ingresar.')
+                        setMsg('Usuario y contraseña actualizados correctamente. Redirigiendo...')
+                        setTimeout(() => navigate('/admin/users'), 2000)
                     } else {
-                        setMsg('Datos actualizados. ℹ️ La contraseña no se cambió (falta clave administrativa).')
+                        setMsg('Datos actualizados. ℹ️ Redirigiendo...')
+                        setTimeout(() => navigate('/admin/users'), 2000)
                     }
                 } else {
-                    setMsg('Usuario actualizado correctamente')
+                    setMsg('Usuario actualizado correctamente. Redirigiendo...')
+                    setTimeout(() => navigate('/admin/users'), 1500)
                 }
             } else {
                 // CREATE (Existing Logic)

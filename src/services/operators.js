@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabase'
-import { OPERATORS } from '../data/operators'
 
 export const operatorService = {
     // Leer todos los operadores (con filtros opcionales)
@@ -59,34 +58,4 @@ export const operatorService = {
         return true
     },
 
-    // MIGRACIÓN MASIVA
-    // Inserta los datos del archivo local a Supabase
-    migrateFromLocal: async () => {
-        console.log('Iniciando migración de', OPERATORS.length, 'operadores...')
-
-        // Preparar datos (mapear claves si es necesario)
-        const records = OPERATORS.map(op => ({
-            name: op.name,
-            site: op.site,
-            group: op.group,
-            is_active: true
-        }))
-
-        // Insertar en lotes de 100 para no saturar
-        const BATCH_SIZE = 100
-        for (let i = 0; i < records.length; i += BATCH_SIZE) {
-            const batch = records.slice(i, i + BATCH_SIZE)
-            const { error } = await supabase
-                .from('operators')
-                .insert(batch)
-
-            if (error) {
-                console.error(`Error en lote ${i}:`, error)
-                throw error
-            }
-        }
-
-        console.log('Migración completada con éxito.')
-        return records.length
-    }
 }

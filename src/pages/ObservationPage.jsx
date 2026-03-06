@@ -159,12 +159,10 @@ export default function ObservationPage() {
                 if (sessionId) {
                     // Actualizar cabecera existente (no duplicar)
                     await observationService.updateHeader(sessionId, sessionData)
-                    console.log('Cabecera actualizada:', sessionId)
                 } else {
                     // Crear nueva cabecera
                     const observation = await observationService.createHeader(sessionData)
                     setSessionId(observation.id)
-                    console.log('Sesión iniciada:', observation.id)
                 }
 
                 setLocked(true)
