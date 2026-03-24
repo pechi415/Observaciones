@@ -107,9 +107,14 @@ export const AuthProvider = ({ children }) => {
             if (!mounted) return
 
             if (session?.user) {
-                // Instant update
-                const fastUser = mapSessionToUser(session.user)
-                setUser(fastUser)
+                // Instant update, but preserve existing DB fields (like role) if we already fetched them
+                setUser(prev => {
+                    const fastUser = mapSessionToUser(session.user)
+                    if (prev && prev.id === fastUser.id) {
+                        return { ...fastUser, ...prev }
+                    }
+                    return fastUser
+                })
                 // Background update (don't need to await here because it usually happens on active app)
                 fetchProfileInBackground(session.user.id)
             } else {
