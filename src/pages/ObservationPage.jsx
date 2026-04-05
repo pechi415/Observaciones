@@ -4,7 +4,7 @@ import Layout from '../components/Layout'
 import SessionHeader from '../components/Observation/SessionHeader'
 import OperatorCard from '../components/Observation/OperatorCard'
 import { observationService } from '../services/observations'
-import { PlusCircle, Save, CheckCircle2, AlertCircle, ArrowLeft, FileEdit } from 'lucide-react'
+import { PlusCircle, Save, CheckCircle2, AlertCircle, ArrowLeft, FileEdit, Trash2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -221,6 +221,28 @@ export default function ObservationPage() {
         setEditingOperator(null)
     }
 
+    const handleDeleteOperator = async (operator, e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (!window.confirm(`¿Estás seguro que deseas eliminar el registro de ${operator.operator_name}?`)) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+            await observationService.deleteRecord(operator.id);
+            setOperators(prev => prev.filter(op => op.id !== operator.id));
+            if (editingOperator && editingOperator.id === operator.id) {
+                setEditingOperator(null);
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Error al eliminar el operador: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
 
 
     const handleFinish = async () => {
@@ -331,7 +353,14 @@ export default function ObservationPage() {
                                                     <span className="text-xs font-mono text-gray-400 mb-1">
                                                         {new Date(op.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
-                                                    <FileEdit className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    <div className="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleEditOperator(op); }} className="text-gray-400 hover:text-blue-500" title="Editar">
+                                                            <FileEdit className="w-4 h-4 hover:scale-110 transition-transform" />
+                                                        </button>
+                                                        <button type="button" onClick={(e) => handleDeleteOperator(op, e)} className="text-gray-400 hover:text-red-500" title="Eliminar">
+                                                            <Trash2 className="w-4 h-4 hover:scale-110 transition-transform" />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </li>
                                         ))}

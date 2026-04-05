@@ -138,6 +138,19 @@ export const observationService = {
     },
 
     /**
+     * Elimina un registro de operador específico
+     */
+    async deleteRecord(recordId) {
+        const { error } = await supabase
+            .from('observation_records')
+            .delete()
+            .eq('id', recordId)
+
+        if (error) throw error
+        return true
+    },
+
+    /**
      * Elimina una observación completa (y sus registros en cascada si está configurado, 
      * o manual si no)
      */
