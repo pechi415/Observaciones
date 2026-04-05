@@ -60,6 +60,8 @@ export const observationService = {
             .select('*')
             .eq('supervisor_id', userId)
             .eq('status', 'in_progress')
+            .order('created_at', { ascending: false })
+            .limit(1)
             .maybeSingle()
 
         if (error) throw error

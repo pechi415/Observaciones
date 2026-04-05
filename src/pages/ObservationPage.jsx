@@ -135,6 +135,8 @@ export default function ObservationPage() {
     // Paso 1: Confirmar Cabecera e Iniciar en BD
     const handleLockSession = async (shouldLock) => {
         if (shouldLock) {
+            if (loading) return // Prevenir doble envío accidental
+            
             // Validaciones básicas
             if (!sessionData.site || !sessionData.shift || !sessionData.group || !sessionData.observationType) {
                 setError('Por favor complete todos los campos de la sesión (Sede, Turno, Grupo, Tipo).')
