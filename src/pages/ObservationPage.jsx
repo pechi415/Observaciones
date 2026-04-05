@@ -314,8 +314,13 @@ export default function ObservationPage() {
                                         {operators.map((op) => (
                                             <li
                                                 key={op.id}
-                                                className={`p-3 rounded-md border-l-4 flex justify-between items-start transition-colors cursor-pointer hover:bg-blue-50 group ${editingOperator?.id === op.id ? 'bg-yellow-50 border-yellow-500 ring-1 ring-yellow-200' : 'bg-gray-50 border-green-500'
-                                                    }`}
+                                                className={`p-3 rounded-md border-l-4 flex justify-between items-start transition-colors cursor-pointer hover:bg-blue-50 group ${
+                                                    editingOperator?.id === op.id 
+                                                        ? 'bg-yellow-50 border-yellow-500 ring-1 ring-yellow-200' 
+                                                        : (Object.values(op.checklist || {}).some(val => String(val).trim().toLowerCase() === 'no') 
+                                                            ? 'bg-red-50 border-red-500' 
+                                                            : 'bg-gray-50 border-green-500')
+                                                }`}
                                                 onClick={() => handleEditOperator(op)}
                                             >
                                                 <div>
