@@ -246,6 +246,16 @@ export default function ObservationPage() {
 
 
     const handleFinish = async () => {
+        // Validación: Menos de 5 operadores y sin desviaciones
+        const hasDeviations = operators.some(op => 
+            Object.values(op.checklist || {}).some(val => String(val).trim().toLowerCase() === 'no')
+        );
+
+        if (operators.length < 5 && !hasDeviations) {
+            alert('No puedes finalizar la sesión. Debes observar al menos 5 operadores, a menos que ya hayas encontrado y registrado alguna desviación.');
+            return;
+        }
+
         try {
             setLoading(true)
             await supabase
