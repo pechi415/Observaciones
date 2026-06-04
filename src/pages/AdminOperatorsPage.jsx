@@ -248,67 +248,84 @@ export default function AdminOperatorsPage() {
                 {/* Modal Crear/Editar */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-fade-in-up">
-                            <h2 className="text-xl font-bold mb-4">
-                                {editingOperator ? 'Editar Operador' : 'Nuevo Operador'}
-                            </h2>
-                            <form onSubmit={handleSave} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        value={formData.name}
-                                        onChange={e => {
-                                            const formattedName = e.target.value
-                                                .split(' ')
-                                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                                .join(' ');
-                                            setFormData({ ...formData, name: formattedName });
-                                        }}
-                                    />
+                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full animate-fade-in-up overflow-hidden">
+                            <div className="bg-[#231F20] px-6 py-4 flex items-center justify-between border-b-4 border-[#E31937]">
+                                <div className="flex items-center">
+                                    {editingOperator ? <Edit2 className="text-white w-6 h-6 mr-3" /> : <PlusCircle className="text-white w-6 h-6 mr-3" />}
+                                    <h2 className="text-xl font-bold text-white">
+                                        {editingOperator ? 'Editar Operador' : 'Nuevo Operador'}
+                                    </h2>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <button onClick={() => setShowModal(false)} className="text-gray-300 hover:text-white transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            
+                            <div className="p-6">
+                                <form onSubmit={handleSave} className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Sede</label>
-                                        <select
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                            value={formData.site}
-                                            onChange={e => setFormData({ ...formData, site: e.target.value })}
-                                        >
-                                            {SITES.map(s => <option key={s} value={s}>{s}</option>)}
-                                        </select>
+                                        <label className="block text-sm font-bold text-[#231F20] mb-1">Nombre Completo *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#E31937] focus:border-[#E31937]"
+                                            value={formData.name}
+                                            onChange={e => {
+                                                const formattedName = e.target.value
+                                                    .split(' ')
+                                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                                    .join(' ');
+                                                setFormData({ ...formData, name: formattedName });
+                                            }}
+                                            placeholder="Ej. Juan Pérez"
+                                        />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Grupo</label>
-                                        <select
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                            value={formData.group}
-                                            onChange={e => setFormData({ ...formData, group: e.target.value })}
-                                        >
-                                            {GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
-                                        </select>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-[#231F20] mb-1">Sede</label>
+                                            <select
+                                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#E31937] focus:border-[#E31937] bg-white"
+                                                value={formData.site}
+                                                onChange={e => setFormData({ ...formData, site: e.target.value })}
+                                            >
+                                                {SITES.map(s => <option key={s} value={s}>{s}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-[#231F20] mb-1">Grupo</label>
+                                            <select
+                                                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#E31937] focus:border-[#E31937] bg-white"
+                                                value={formData.group}
+                                                onChange={e => setFormData({ ...formData, group: e.target.value })}
+                                            >
+                                                {GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="flex justify-end space-x-3 pt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowModal(false)}
-                                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                                        disabled={loading}
-                                    >
-                                        {loading ? 'Guardando...' : 'Guardar'}
-                                    </button>
-                                </div>
-                            </form>
+                                    <div className="flex justify-end space-x-3 pt-4 border-t mt-6">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowModal(false)}
+                                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="bg-[#E31937] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#CA0926] transition flex items-center shadow-md transform active:scale-95"
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Guardando...' : (
+                                                <>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 mr-2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                                    {editingOperator ? 'Guardar Cambios' : 'Crear Operador'}
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 )}
