@@ -247,7 +247,7 @@ export default function AdminOperatorsPage() {
 
                 {/* Modal Crear/Editar */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="fixed inset-0 bg-gray-50 flex items-start justify-center pt-20 p-4 z-50 overflow-y-auto">
                         <div className="bg-white rounded-lg shadow-xl max-w-md w-full animate-fade-in-up overflow-hidden">
                             <div className="bg-[#231F20] px-6 py-4 flex items-center justify-between border-b-4 border-[#E31937]">
                                 <div className="flex items-center">
