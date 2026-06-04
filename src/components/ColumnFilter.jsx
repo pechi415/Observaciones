@@ -1,5 +1,6 @@
 import { Filter, Search, X } from 'lucide-react'
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { normalizeString } from '../utils/stringUtils'
 
 // Custom Hook for Click Outside
 export function useOnClickOutside(ref, handler) {
@@ -99,7 +100,7 @@ export const ColumnFilter = ({ column, data, filters, onChange }) => {
     useOnClickOutside(containerRef, () => setIsOpen(false))
 
     const displayedValues = uniqueValues.filter(v =>
-        v.toLowerCase().includes(searchTerm.toLowerCase())
+        normalizeString(v).includes(normalizeString(searchTerm))
     )
 
     const isFilterActive = filters[column.accessor] !== undefined

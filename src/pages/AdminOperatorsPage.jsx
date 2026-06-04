@@ -5,6 +5,7 @@ import { operatorService } from '../services/operators'
 import { SITES, GROUPS } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { normalizeString } from '../utils/stringUtils'
 
 export default function AdminOperatorsPage() {
     const { user } = useAuth()
@@ -43,7 +44,7 @@ export default function AdminOperatorsPage() {
 
     // Filtrado en cliente por nombre (ya que getAll filtra por Sede/Grupo en servidor)
     const filteredList = operators.filter(op =>
-        op.name.toLowerCase().includes(searchTerm.toLowerCase())
+        normalizeString(op.name).includes(normalizeString(searchTerm))
     )
 
     const handleSave = async (e) => {

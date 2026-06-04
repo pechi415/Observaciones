@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Check, X, Search, ChevronDown } from 'lucide-react'
 import { OBSERVATION_QUESTIONS } from '../../constants'
 import { operatorService } from '../../services/operators'
+import { normalizeString } from '../../utils/stringUtils'
 
 export default function OperatorCard({ onSave, onCancel, initialData = null, observationType, selectedSite, selectedGroup }) {
     const [operatorName, setOperatorName] = useState('')
@@ -31,7 +32,7 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
     // Filtro reactivo para la búsqueda
     const filteredOperators = useMemo(() => {
         return (operatorsList || []).filter(op =>
-            op.name.toLowerCase().includes(searchTerm.toLowerCase())
+            normalizeString(op.name).includes(normalizeString(searchTerm))
         )
     }, [operatorsList, searchTerm])
 

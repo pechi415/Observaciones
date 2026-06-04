@@ -17,6 +17,7 @@ import {
     Check,
     Star
 } from 'lucide-react'
+import { normalizeString } from '../utils/stringUtils'
 
 export default function AdminUsersListPage() {
     const [users, setUsers] = useState([])
@@ -90,11 +91,12 @@ export default function AdminUsersListPage() {
         }
     }
 
-    const filteredUsers = users.filter(user =>
-        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.observer_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredUsers = users.filter(user => {
+        const term = normalizeString(searchTerm);
+        return normalizeString(user.full_name).includes(term) ||
+               normalizeString(user.observer_id).includes(term) ||
+               normalizeString(user.email).includes(term);
+    });
 
     const getRoleIcon = (role) => {
         switch (role) {
