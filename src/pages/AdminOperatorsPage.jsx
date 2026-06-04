@@ -260,7 +260,13 @@ export default function AdminOperatorsPage() {
                                         required
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        onChange={e => {
+                                            const formattedName = e.target.value
+                                                .split(' ')
+                                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                                .join(' ');
+                                            setFormData({ ...formData, name: formattedName });
+                                        }}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
