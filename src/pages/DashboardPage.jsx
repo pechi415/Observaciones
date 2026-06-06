@@ -955,31 +955,29 @@ export default function DashboardPage() {
 
                     <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-center w-full justify-end">
                         {/* Date Range */}
-                        <div className="w-full sm:w-auto flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-3 h-10 shadow-sm focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-                            <Calendar className="w-4 h-4 text-blue-500 mr-1" />
-                            <div className="relative w-24">
+                        <div className="w-full sm:w-auto flex items-center bg-white border border-gray-200 rounded-lg px-3 h-10 shadow-sm focus-within:ring-2 focus-within:ring-blue-100 transition-all overflow-x-auto custom-scrollbar">
+                            <Calendar className="w-4 h-4 text-blue-500 mr-2 shrink-0" />
+                            <div className="flex items-center space-x-1 shrink-0">
+                                <span className="text-xs text-gray-400 font-medium">Desde:</span>
                                 <input
-                                    type="text"
+                                    type="date"
                                     name="startDate"
                                     value={filters.startDate}
                                     onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                                    onFocus={(e) => (e.target.type = "date")}
-                                    onBlur={(e) => (e.target.type = filters.startDate ? "date" : "text")}
-                                    className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
-                                    placeholder="Desde"
+                                    className="text-sm outline-none bg-transparent text-gray-700 font-medium w-[115px] cursor-pointer"
+                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                                 />
                             </div>
-                            <span className="text-gray-300">|</span>
-                            <div className="relative w-24">
+                            <div className="mx-2 w-[1px] h-5 bg-gray-200 shrink-0"></div>
+                            <div className="flex items-center space-x-1 shrink-0">
+                                <span className="text-xs text-gray-400 font-medium">Hasta:</span>
                                 <input
-                                    type="text"
+                                    type="date"
                                     name="endDate"
                                     value={filters.endDate}
                                     onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                                    onFocus={(e) => (e.target.type = "date")}
-                                    onBlur={(e) => (e.target.type = filters.endDate ? "date" : "text")}
-                                    className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700 font-medium"
-                                    placeholder="Hasta"
+                                    className="text-sm outline-none bg-transparent text-gray-700 font-medium w-[115px] cursor-pointer"
+                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                                 />
                             </div>
                         </div>
