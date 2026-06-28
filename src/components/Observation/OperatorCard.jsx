@@ -212,6 +212,7 @@ export default function OperatorCard({ onSave, onCancel, initialData = null, obs
                     <textarea
                         value={comments}
                         onChange={(e) => setComments(e.target.value)}
+                        onFocus={(e) => e.target.select()}
                         rows={2}
                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
